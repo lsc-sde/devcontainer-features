@@ -2,7 +2,7 @@
     "id": "lscsde",
     "version": "0.1.1",
     "name": "lscsde",
-    "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/lscsde",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/lscsde.html",
     "description": "Installs lscsde onto the devcontainer",
     "options": {
         "fluxRepoUrl" : {

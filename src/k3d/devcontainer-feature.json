@@ -2,7 +2,7 @@
     "id": "k3d",
     "version": "0.1.1",
     "name": "k3d",
-    "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/k3d",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/k3d.html",
     "description": "Installs k3d onto the devcontainer",
     "options": {
         "hostVolumePath" : {
