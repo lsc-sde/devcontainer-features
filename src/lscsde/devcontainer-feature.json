@@ -23,10 +23,9 @@
         }
     },
     "installsAfter" :[
-        "./features/k3d",
-        "./features/metallb",
-        "./features/fluxcd",
-        "./features/aks-tools"
+        "ghcr.io/lsc-sde/devcontainer-features/k3d",
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/aks-tools"
     ],
 	"postStartCommand": "setup-terminal-lscsde"
 }

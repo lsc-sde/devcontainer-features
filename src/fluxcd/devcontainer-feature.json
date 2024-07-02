@@ -7,7 +7,7 @@
     "options": {
     },
     "installsAfter" :[
-        "./features/k3d"
+        "ghcr.io/lsc-sde/devcontainer-features/k3d"
     ],
 	"postCreateCommand": "setup-fluxcd"
 }
