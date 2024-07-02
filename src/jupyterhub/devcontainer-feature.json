@@ -1,6 +1,6 @@
 {
     "id": "jupyterhub",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "jupyterhub",
     "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/jupyterhub",
     "description": "Installs the JupyterHub into the devcontainer's k3s cluster",

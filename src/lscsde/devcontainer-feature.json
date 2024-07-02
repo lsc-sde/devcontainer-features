@@ -1,6 +1,6 @@
 {
     "id": "lscsde",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "lscsde",
     "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/lscsde",
     "description": "Installs lscsde onto the devcontainer",

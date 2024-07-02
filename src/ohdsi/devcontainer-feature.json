@@ -1,6 +1,6 @@
 {
     "id": "ohdsi",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "ohdsi",
     "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/ohdsi",
     "description": "Installs the OHDSI into the devcontainer's k3s cluster",
