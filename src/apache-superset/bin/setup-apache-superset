@@ -1,0 +1,37 @@
+#!/bin/bash
+
+. /etc/k3d/setup/environment
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/apache-superset/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+
+sudo mkdir -p "${WORK_FOLDER}"
+sudo chmod 0777 "${WORK_FOLDER}"
+
+cd "${WORK_FOLDER}"
+
+helm repo add superset https://apache.github.io/superset
+
+if [ -f "${SECRETSPATH}/ApacheSupersetSecretKey" ]; then
+    echo "ApacheSupersetSecretKey is present in secrets"
+    SECRET_KEY=$(cat "${SECRETSPATH}/ApacheSupersetSecretKey")
+else
+    echo "ApacheSupersetSecretKey does not exist in secrets, creating it now"
+    SECRET_KEY=$(openssl rand -base64 42) 
+    echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
+fi
+
+cat <<EOF > superset-config.yaml
+postgresql:
+  postgresqlPassword: "R3s3tM3N0w!"
+
+configOverrides:
+  secret: |
+    SECRET_KEY = '${SECRET_KEY}'
+
+EOF
+
+helm upgrade --install -n superset --create-namespace --values superset-config.yaml superset  superset/superset
+
+cd "${CURRENT_FOLDER}"
