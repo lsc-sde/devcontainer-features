@@ -120,6 +120,25 @@ spec:
   
   jupyterWorkspace:
     image: lscsde/datascience-notebook-default:0.1.0
+---
+apiVersion: xlscsde.nhs.uk/v1
+kind: AnalyticsWorkspace
+metadata:
+  name: omop-workspace
+  namespace: jh-test
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  displayName: OMOP Workspace
+  description: |
+    OMOP workspace test
+  
+  validity:
+    availableFrom: "2024-07-08"
+    expires: "2024-10-01"
+  
+  jupyterWorkspace:
+    image: lscsde/docker-datascience-jupyter-omop:base-v1-arm64
 EOF
 kubectl apply -f workspaces.yaml
 
@@ -147,6 +166,18 @@ spec:
   workspace: test-workspace
   username: "jovyan"
   expires: "2029-01-01"
+---
+apiVersion: xlscsde.nhs.uk/v1
+kind: AnalyticsWorkspaceBinding
+metadata:
+  name: omop-workspace-jovyan
+  namespace: jh-test
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  workspace: omop-workspace
+  username: "jovyan"
+  expires: "2025-01-01"
 EOF
 kubectl apply -f workspace-bindings.yaml
 
