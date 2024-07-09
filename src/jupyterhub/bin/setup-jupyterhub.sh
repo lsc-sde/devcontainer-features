@@ -170,7 +170,7 @@ spec:
 apiVersion: xlscsde.nhs.uk/v1
 kind: AnalyticsWorkspaceBinding
 metadata:
-  name: omop-workspace-jovyan
+  name: omoooop-workspace-jovyan
   namespace: jh-test
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
