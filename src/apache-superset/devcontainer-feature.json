@@ -1,14 +1,10 @@
 {
     "id": "apache-superset",
     "version": "0.1.0",
-    "name": "aks-tools",
+    "name": "apache-superset",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/apache-superset.html",
     "description": "Installs apache-superset onto the devcontainer",
     "options": {
-        "clusterName" : {
-            "type": "string",
-            "default": "devcontainer"
-        }
     },
     "installsAfter" :[
         "ghcr.io/lsc-sde/devcontainer-features/k3d"

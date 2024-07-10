@@ -22,12 +22,12 @@ cd "${WORK_FOLDER}"
 helm repo add superset https://apache.github.io/superset
 
 if [ -f "${SECRETSPATH}/ApacheSupersetSecretKey" ]; then
-    echo "ApacheSupersetSecretKey is present in secrets"
-    SECRET_KEY=$(cat "${SECRETSPATH}/ApacheSupersetSecretKey")
+  echo "ApacheSupersetSecretKey is present in secrets"
+  SECRET_KEY=$(cat "${SECRETSPATH}/ApacheSupersetSecretKey")
 else
-    echo "ApacheSupersetSecretKey does not exist in secrets, creating it now"
-    SECRET_KEY=$(openssl rand -base64 42) 
-    echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
+  echo "ApacheSupersetSecretKey does not exist in secrets, creating it now"
+  SECRET_KEY=$(openssl rand -base64 42) 
+  echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
 fi
 
 cat <<EOF > superset-config.yaml
@@ -38,12 +38,18 @@ configOverrides:
   secret: |
     SECRET_KEY = '${SECRET_KEY}'
 
+
 image:
   repository: ${IMAGE_NAME}
   tag: ${IMAGE_TAG}
   imagePullPolicy: Always
+
+bootstrapScript: |
+  #!/bin/bash
+  pip install --upgrade "apache-superset[databricks]"
+  pip install --upgrade authlib
 EOF
 
-helm upgrade --install -n superset --create-namespace --values superset-config.yaml superset  superset/superset
-
+helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
+kubectl rollout restart deployments/superset-test -n superset-test
 cd "${CURRENT_FOLDER}"
