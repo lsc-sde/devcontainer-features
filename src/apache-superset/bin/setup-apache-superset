@@ -1,0 +1,55 @@
+#!/bin/bash
+
+. /etc/k3d/setup/environment
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/apache-superset/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+IMAGE_NAME="k3d-${CLUSTERNAME}-registry.local:${REGISTRY_PORT}/apache/superset"
+IMAGE_TAG="local"
+CONTAINER_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
+
+
+sudo mkdir -p "${WORK_FOLDER}"
+sudo chmod 0777 "${WORK_FOLDER}"
+
+cd "/workspaces/lsc-sde/products/sde-3rd-party/superset/docker-apache-superset"
+docker build . -t "${CONTAINER_IMAGE}"
+docker push "${CONTAINER_IMAGE}"
+
+cd "${WORK_FOLDER}"
+
+helm repo add superset https://apache.github.io/superset
+
+if [ -f "${SECRETSPATH}/ApacheSupersetSecretKey" ]; then
+  echo "ApacheSupersetSecretKey is present in secrets"
+  SECRET_KEY=$(cat "${SECRETSPATH}/ApacheSupersetSecretKey")
+else
+  echo "ApacheSupersetSecretKey does not exist in secrets, creating it now"
+  SECRET_KEY=$(openssl rand -base64 42) 
+  echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
+fi
+
+cat <<EOF > superset-config.yaml
+postgresql:
+  postgresqlPassword: "R3s3tM3N0w!"
+
+configOverrides:
+  secret: |
+    SECRET_KEY = '${SECRET_KEY}'
+
+
+image:
+  repository: ${IMAGE_NAME}
+  tag: ${IMAGE_TAG}
+  imagePullPolicy: Always
+
+bootstrapScript: |
+  #!/bin/bash
+  pip install --upgrade "apache-superset[databricks]"
+  pip install --upgrade authlib
+EOF
+
+helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
+kubectl rollout restart deployments/superset-test -n superset-test
+cd "${CURRENT_FOLDER}"
