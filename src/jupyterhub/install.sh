@@ -18,7 +18,6 @@ EOF
 
 cp -R ./bin /usr/lib/jupyterhub/
 
-#ln -s /usr/lib/jupyterhub/bin/setup-jupyterhub.sh /bin/setup-jupyterhub
 ln -s $(readlink -f ./bin/setup-jupyterhub.sh) /bin/setup-jupyterhub
 
 
