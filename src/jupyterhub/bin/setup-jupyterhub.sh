@@ -129,7 +129,7 @@ metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
-  displayName: OMOP Workspace
+  displayName: OMOP Darwin Workspace
   description: |
     OMOP workspace test
   
@@ -138,7 +138,7 @@ spec:
     expires: "2024-10-01"
   
   jupyterWorkspace:
-    image: lscsde/docker-datascience-jupyter-omop:base-v1-arm64
+    image: lscsde/docker-datascience-jupyter-omop:darwin-v1.4.0-amd64
 EOF
 kubectl apply -f workspaces.yaml
 
