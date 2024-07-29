@@ -151,6 +151,25 @@ spec:
     
     nodeSelector:
       lsc-sde.nhs.uk/nodeType: datascience-large
+---
+apiVersion: xlscsde.nhs.uk/v1
+kind: AnalyticsWorkspace
+metadata:
+  name: omop-workspace
+  namespace: jh-test
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  displayName: OMOP Darwin Workspace
+  description: |
+    OMOP workspace test
+  
+  validity:
+    availableFrom: "2024-07-08"
+    expires: "2024-10-01"
+  
+  jupyterWorkspace:
+    image: lscsde/docker-datascience-jupyter-omop:darwin-v1.4.0-amd64
 EOF
 kubectl apply -f workspaces.yaml
 
@@ -190,6 +209,18 @@ spec:
   workspace: test-workspace-tolerations
   username: "jovyan"
   expires: "2029-01-01"
+---
+apiVersion: xlscsde.nhs.uk/v1
+kind: AnalyticsWorkspaceBinding
+metadata:
+  name: omoooop-workspace-jovyan
+  namespace: jh-test
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  workspace: omop-workspace
+  username: "jovyan"
+  expires: "2025-01-01"
 EOF
 kubectl apply -f workspace-bindings.yaml
 

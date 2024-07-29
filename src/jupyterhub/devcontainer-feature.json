@@ -1,6 +1,6 @@
 {
     "id": "jupyterhub",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "jupyterhub",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/jupyterhub.html",
     "description": "Installs the JupyterHub into the devcontainer's k3s cluster",
@@ -15,7 +15,7 @@
         },
         "chartVersion" : {
             "type" : "string",
-            "default" : "3.2.1"
+            "default" : "3.3.7"
         },
         "namespace" : {
             "type" : "string",
