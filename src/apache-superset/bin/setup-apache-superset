@@ -30,14 +30,58 @@ else
   echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
 fi
 
+CLIENT_ID=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientID")
+CLIENT_SECRET=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientSecret")
+AZ_TENANT_ID=$(cat "${SECRETSPATH}/AzureTenantId")
+
 cat <<EOF > superset-config.yaml
 postgresql:
   postgresqlPassword: "R3s3tM3N0w!"
 
-configOverrides:
+# This is to workaround the problem with coredns which makes login.microsoftonline.com unavailable on docker desktop
+hostAliases: 
+- ip: 40.126.53.16
+  hostnames:
+  - login.microsoftonline.com
+
+configOverrides:  
   secret: |
     SECRET_KEY = '${SECRET_KEY}'
 
+  enable_oauth: |
+    # This will make sure the redirect_uri is properly computed, even with SSL offloading
+    ENABLE_PROXY_FIX = True
+
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+    AUTH_TYPE = AUTH_OAUTH
+    OAUTH_PROVIDERS = [
+      {
+        "name": "azure",
+        "icon": "fa-windows",
+        "token_key": "access_token",
+        "remote_app": {
+          "client_id": "${CLIENT_ID}",
+          "client_secret": "${CLIENT_SECRET}",
+          "api_base_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2",
+          "client_kwargs": {
+              "scope": "User.read name preferred_username email profile upn",
+              "resource": "${CLIENT_ID}",
+              # Optionally enforce signature JWT verification
+              "verify_signature": False
+          },
+          "request_token_url": None,
+          "access_token_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2/token",
+          "authorize_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2/authorize",
+        },
+      },
+    ]
+
+    
+    # Will allow user self registration, allowing to create Flask users from Authorized User
+    AUTH_USER_REGISTRATION = True
+
+    # The default user self registration role
+    AUTH_USER_REGISTRATION_ROLE = "Public"
 
 image:
   repository: ${IMAGE_NAME}
@@ -48,7 +92,10 @@ bootstrapScript: |
   #!/bin/bash
   pip install --upgrade "apache-superset[databricks]"
   pip install --upgrade authlib
+
 EOF
+
+cat superset-config.yaml
 
 helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
 kubectl rollout restart deployments/superset-test -n superset-test
