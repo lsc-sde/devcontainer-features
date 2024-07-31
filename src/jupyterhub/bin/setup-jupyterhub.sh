@@ -159,6 +159,13 @@ spec:
   
   jupyterWorkspace:
     image: lscsde/datascience-notebook-default:0.1.0
+    resources:
+      requests:
+        memory: "256M"
+        cpu: 0.15
+      limits:
+        memory: "512M"
+        cpu: 0.25
     
     tolerations:
     - key: "sdeAppType"
