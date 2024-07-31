@@ -1,0 +1,9 @@
+hub:
+  image:
+    name: k3d-devcontainer-registry.local:36471/jupyterhub
+    tag: local
+    pullPolicy: Always
+  extraEnv:
+    DEFAULT_STORAGE_CLASS: "jupyter-default"
+    DEFAULT_STORAGE_ACCESS_MODES: "ReadWriteOnce"
+    DEFAULT_STORAGE_CAPACITY: "1Gi"

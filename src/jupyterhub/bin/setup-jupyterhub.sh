@@ -97,6 +97,13 @@ spec:
     image: lscsde/datascience-notebook-default:0.1.0
     persistentVolumeClaim: 
       name: jupyter-default-generic-workspace
+    resources:
+      requests:
+        memory: "256M"
+        cpu: 0.1
+      limits:
+        memory: "1G"
+        cpu: 0.5
 ---
 apiVersion: xlscsde.nhs.uk/v1
 kind: AnalyticsWorkspace
@@ -120,6 +127,15 @@ spec:
   
   jupyterWorkspace:
     image: lscsde/datascience-notebook-default:0.1.0
+    persistentVolumeClaim: 
+      name: jupyter-test-workspace
+    resources:
+      requests:
+        memory: "256M"
+        cpu: 0.1
+      limits:
+        memory: "1G"
+        cpu: 0.5
 ---
 apiVersion: xlscsde.nhs.uk/v1
 kind: AnalyticsWorkspace
@@ -139,6 +155,15 @@ spec:
   
   jupyterWorkspace:
     image: lscsde/docker-datascience-jupyter-omop:darwin-v1.4.0-amd64
+    persistentVolumeClaim: 
+      name: jupyter-omop-darwin-workspace
+    resources:
+      requests:
+        memory: "256M"
+        cpu: 0.1
+      limits:
+        memory: "1G"
+        cpu: 0.5
 EOF
 kubectl apply -f workspaces.yaml
 
@@ -170,7 +195,7 @@ spec:
 apiVersion: xlscsde.nhs.uk/v1
 kind: AnalyticsWorkspaceBinding
 metadata:
-  name: omoooop-workspace-jovyan
+  name: omop-workspace-jovyan
   namespace: jh-test
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
