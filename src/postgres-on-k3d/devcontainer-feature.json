@@ -1,0 +1,30 @@
+{
+    "id": "postgres-on-k3d",
+    "version": "0.1.0",
+    "name": "postgres-on-k3d",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/postgres-on-k3d.html",
+    "description": "Installs the PostgreSQL into the devcontainer's k3s cluster",
+    "options": {
+        "helmRepository" : {
+            "type" : "string",
+            "default" : "https://charts.bitnami.com/bitnami"
+        },
+        "chartName" : {
+            "type" : "string",
+            "default" : "postgresql"
+        },
+        "chartVersion" : {
+            "type" : "string",
+            "default" : "11.1.26"
+        },
+        "namespace" : {
+            "type" : "string",
+            "default" : "postgres-on-k3d"
+        }
+    },
+    "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/k3d",
+        "ghcr.io/lsc-sde/devcontainer-features/metallb",
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
+    ]
+}
