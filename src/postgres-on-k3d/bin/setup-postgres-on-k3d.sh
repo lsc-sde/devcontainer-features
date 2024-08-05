@@ -11,6 +11,7 @@ mkdir -p "${WORK_FOLDER}"
 cd "${WORK_FOLDER}"
 
 helm repo add postgres-on-k3d "${HELM_REPOSITORY}"
+helm repo update
 helm install k3d-postgres "postgres-on-k3d/${CHART_NAME}" --version "${CHART_VERSION}" -n "${NAMESPACE}"
 
 cd "${CURRENT_FOLDER}"
