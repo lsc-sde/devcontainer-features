@@ -7,7 +7,7 @@
     "options": {
         "helmRepository" : {
             "type" : "string",
-            "default" : "oci://registry-1.docker.io/bitnamicharts/postgresql"
+            "default" : "oci://registry-1.docker.io/bitnamicharts"
         },
         "chartName" : {
             "type" : "string",
