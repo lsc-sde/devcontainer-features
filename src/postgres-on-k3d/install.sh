@@ -11,10 +11,13 @@ HELM_REPOSITORY="${HELMREPOSITORY}"
 NAMESPACE="${NAMESPACE}"
 CHART_NAME="${CHARTNAME}"
 CHART_VERSION="${CHARTVERSION}"
+INSTANCE_NAME="${INSTANCENAME}"
+PG_INSTANCE="${INSTANCENAME}-postgresql"
+PG_FQDN="${INSTANCENAME}-postgresql.${NAMESPACE}.svc.cluster.local"
 EOF
 
 cp -R ./bin "${BASEDIR}/"
 
-ln -s $(readlink -f ./bin/setup-postgres-on-k3d.sh) /bin/setup-postgres-on-k3d
+ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/install.sh /bin/setup-postgres-on-k3d
 
 exit 0

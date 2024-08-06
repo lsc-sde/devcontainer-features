@@ -1,6 +1,6 @@
 {
     "id": "postgres-on-k3d",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "postgres-on-k3d",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/postgres-on-k3d.html",
     "description": "Installs the PostgreSQL into the devcontainer's k3s cluster",
@@ -20,6 +20,10 @@
         "namespace" : {
             "type" : "string",
             "default" : "postgres-on-k3d"
+        },
+        "instanceName" : {
+            "type" : "string",
+            "default" : "k3d-postgres"
         }
     },
     "installsAfter" :[

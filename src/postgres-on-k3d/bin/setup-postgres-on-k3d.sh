@@ -10,8 +10,8 @@ CURRENT_FOLDER=$(pwd)
 mkdir -p "${WORK_FOLDER}"
 cd "${WORK_FOLDER}"
 
-helm repo add postgres-on-k3d "${HELM_REPOSITORY}"
-helm repo update
-helm install k3d-postgres "postgres-on-k3d/${CHART_NAME}" --version "${CHART_VERSION}" -n "${NAMESPACE}"
+helm upgrade -i ${INSTANCE_NAME} "${HELM_REPOSITORY}/${CHART_NAME}" --version "${CHART_VERSION}" -n "${NAMESPACE}" --create-namespace
+
+PGPASSWORD=$(kubectl get secret --namespace "${NAMESPACE}" "${PG_INSTANCE}" -o jsonpath="{.data.postgres-password}" | base64 -d)
 
 cd "${CURRENT_FOLDER}"
