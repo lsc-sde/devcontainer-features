@@ -18,6 +18,6 @@ EOF
 
 cp -R ./bin "${BASEDIR}/"
 
-ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/install.sh /bin/setup-postgres-on-k3d
+ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/bin/setup-postgres-on-k3d.sh /bin/setup-postgres-on-k3d
 
 exit 0
