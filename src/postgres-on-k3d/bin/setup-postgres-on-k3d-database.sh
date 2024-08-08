@@ -35,7 +35,7 @@ mkdir -p "${WORK_FOLDER}"
 cd "${WORK_FOLDER}"
 
 export PGPASSWORD=$(kubectl get secret --namespace "${NAMESPACE}" "${PG_INSTANCE}" -o jsonpath="{.data.postgres-password}" | base64 -d)
-nohup kubectl port-forward --namespace "${NAMESPACE}" "svc/${PG_INSTANCE}" 5432:5432
+nohup kubectl port-forward --namespace "${NAMESPACE}" "svc/${PG_INSTANCE}" 5432:5432 &
 
 
 DBEXISTS=$(psql -h 127.0.0.1 -U postgres --csv -t -c "SELECT datname FROM pg_database WHERE datname = '${DATABASENAME}';")
