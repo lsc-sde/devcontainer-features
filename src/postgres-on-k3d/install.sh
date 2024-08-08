@@ -23,6 +23,6 @@ ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d
 ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/bin/setup-postgres-on-k3d-user.sh /bin/setup-postgres-on-k3d-user
 
 apt-get update
-apt-get install postgresql-client
+apt-get install postgresql-client -y
 
 exit 0
