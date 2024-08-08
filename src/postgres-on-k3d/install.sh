@@ -19,5 +19,9 @@ EOF
 cp -R ./bin "${BASEDIR}/"
 
 ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/bin/setup-postgres-on-k3d.sh /bin/setup-postgres-on-k3d
+ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/bin/setup-postgres-on-k3d-database.sh /bin/setup-postgres-on-k3d-database
+ln -s /workspaces/lsc-sde/products/sde/devcontainer-features/src/postgres-on-k3d/bin/setup-postgres-on-k3d-user.sh /bin/setup-postgres-on-k3d-user
+
+apt-get install postgresql-client
 
 exit 0
