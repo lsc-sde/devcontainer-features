@@ -1,12 +1,12 @@
 {
     "id": "apache-superset",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "apache-superset",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/apache-superset.html",
     "description": "Installs apache-superset onto the devcontainer",
     "options": {
     },
     "installsAfter" :[
-        "ghcr.io/lsc-sde/devcontainer-features/k3d"
+        "ghcr.io/lsc-sde/devcontainer-features/postgres-on-k3d"
     ]
 }

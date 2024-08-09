@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . /etc/k3d/setup/environment
+. /usr/lib/postgres-on-k3d/etc/environment
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
 WORK_FOLDER="/usr/lib/apache-superset/work/${CURRENT_DATE}"
@@ -19,6 +20,9 @@ docker push "${CONTAINER_IMAGE}"
 
 cd "${WORK_FOLDER}"
 
+setup-postgres-on-k3d-user -u superset -p superset
+setup-postgres-on-k3d-database -n superset -o superset
+
 helm repo add superset https://apache.github.io/superset
 
 if [ -f "${SECRETSPATH}/ApacheSupersetSecretKey" ]; then
@@ -33,10 +37,44 @@ fi
 CLIENT_ID=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientID")
 CLIENT_SECRET=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientSecret")
 AZ_TENANT_ID=$(cat "${SECRETSPATH}/AzureTenantId")
+PG_FQDN_B64=$(echo -n "${PG_FQDN}" | base64 -w0)
+
+cat <<EOF > superset-test-env.yaml
+apiVersion: v1
+data:
+  DB_HOST: ${PG_FQDN_B64}
+  DB_NAME: c3VwZXJzZXQ=
+  DB_PASS: c3VwZXJzZXQ=
+  DB_PORT: NTQzMg==
+  DB_USER: c3VwZXJzZXQ=
+  REDIS_CELERY_DB: MA==
+  REDIS_DB: MQ==
+  REDIS_HOST: c3VwZXJzZXQtdGVzdC1yZWRpcy1oZWFkbGVzcw==
+  REDIS_PORT: NjM3OQ==
+  REDIS_PROTO: cmVkaXM=
+  REDIS_USER: ""
+kind: Secret
+metadata:
+  name: superset-test-env
+  namespace: superset-test
+type: Opaque
+EOF
+
+kubectl apply -f superset-test-env.yaml
 
 cat <<EOF > superset-config.yaml
+secretEnv:
+  create: false
+
 postgresql:
-  postgresqlPassword: "R3s3tM3N0w!"
+  enabled: false
+
+connections:
+  db_host: "${PG_FQDN}"
+  db_port: "5432"
+  db_user: "superset"
+  db_pass: "superset"
+  db_name: "superset"
 
 # This is to workaround the problem with coredns which makes login.microsoftonline.com unavailable on docker desktop
 hostAliases: 
@@ -81,7 +119,7 @@ configOverrides:
     AUTH_USER_REGISTRATION = True
 
     # The default user self registration role
-    AUTH_USER_REGISTRATION_ROLE = "Public"
+    AUTH_USER_REGISTRATION_ROLE = "Admin"
 
 image:
   repository: ${IMAGE_NAME}
@@ -95,8 +133,9 @@ bootstrapScript: |
 
 EOF
 
-cat superset-config.yaml
+#cat superset-config.yaml
 
 helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
 kubectl rollout restart deployments/superset-test -n superset-test
+nohup kubectl port-forward service/superset-test 8088:8088 --namespace superset-test &
 cd "${CURRENT_FOLDER}"
