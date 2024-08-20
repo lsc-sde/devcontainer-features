@@ -1,0 +1,16 @@
+{
+    "id": "kustomize",
+    "version": "0.1.0",
+    "name": "kustomize",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/kustomize.html",
+    "description": "Installs kustomize into the devcontainer",
+    "options": {
+        "kustomizeInstallUrl" : {
+            "type" : "string",
+            "default" : "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+        }
+    },
+    "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/k3d"
+    ]
+}
