@@ -1,0 +1,26 @@
+{
+    "id": "nginx",
+    "version": "0.1.0",
+    "name": "nginx",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/nginx.html",
+    "description": "Installs NGINX into the devcontainer's k3s cluster",
+    "options": {
+        "fluxPath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/flux/nginx"
+        },
+        "nginxVersion" : {
+            "type" : "string",
+            "default" : "4.9.1"
+        },
+        "nginxNamespace" : {
+            "type" : "string",
+            "default" : "ingress-nginx"
+        }
+    },
+    "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/k3d",
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
+    ],
+	"postCreateCommand": "setup-nginx"
+}

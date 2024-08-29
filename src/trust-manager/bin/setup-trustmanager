@@ -1,0 +1,75 @@
+#!/bin/bash
+
+sudo chmod 0777 /var/lib/rancher/k3s/storage
+
+. /etc/k3d/setup/environment
+. /usr/lib/trust-manager/etc/environment
+
+echo "Setting up trust-manager"
+echo "TRUSTMANAGER_NAMESPACE = ${TRUSTMANAGER_NAMESPACE}"
+echo "TRUSTMANAGER_VERSION = ${TRUSTMANAGER_VERSION}"
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/trust-manager/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+
+if [ ! -f "/usr/lib/trust-manager/work/ca.key" ]; then
+  echo "CA Private Key does not exist, creating it"
+  openssl req -subj '/CN=root/CN=xlscsde/CN=local/C=GB/ST=Anywhere/O=Lancashire and South Cumbria ICS' \
+    -newkey rsa:2048 \
+    -nodes \
+    -keyout /usr/lib/trust-manager/work/ca.key \
+    -x509 \
+    -days 3650 \
+    -out /usr/lib/trust-manager/work/ca.crt
+fi
+
+mkdir -p "${WORK_FOLDER}"
+cd "${WORK_FOLDER}"
+
+cat <<EOF > ./namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${TRUSTMANAGER_NAMESPACE}
+EOF
+
+kubectl create secret generic root-certificate --from-file="/usr/lib/trust-manager/work/ca.crt" -n "${TRUSTMANAGER_NAMESPACE}"
+
+
+kubectl apply -f ./namespace.yaml
+
+helm repo add trust-manager https://charts.jetstack.io
+helm repo update
+
+helm upgrade trust-manager --install trust-manager/trust-manager -n "${TRUSTMANAGER_NAMESPACE}" --version "${TRUSTMANAGER_VERSION}" --wait --set app.webhook.tls.helmCert.enabled=true
+
+cat <<EOF > ./bundle.yaml
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: xlscsde-local-bundle
+spec:
+  sources:
+  - useDefaultCAs: true
+  - secret:
+      name: root-certificate
+      key: ca.crt
+  target:
+    configMap:
+      key: "ca-certificates.crt" 
+    additionalFormats:
+      jks:
+        key: "bundle.jks"
+      pkcs12:
+        key: "bundle.p12"
+    namespaceSelector:
+      matchLabels:
+        xlscsde.local/inject: "enabled"
+EOF
+
+kubectl apply -f ./bundle.yaml
+
+cd "${CURRENT_FOLDER}"
+
+exit 0
