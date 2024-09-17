@@ -10,12 +10,21 @@ echo "Setting up keycloak operator"
 echo "KEYCLOAK_NAMESPACE = ${KEYCLOAK_NAMESPACE}"
 echo "KEYCLOAK_FLUX_PATH = ${KEYCLOAK_FLUX_PATH}"
 echo "KEYCLOAK_VERSION = ${KEYCLOAK_VERSION}"
+echo "KEYCLOAK_IMAGE = ${KEYCLOAK_IMAGE}"
+
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+export KEYCLOAK_INSTANCE_IMAGE="${KEYCLOAK_IMAGE}:${CURRENT_DATE}"
 WORK_FOLDER="/usr/lib/keycloak/work/${CURRENT_DATE}"
 CURRENT_FOLDER=$(pwd)
 
 mkdir -p "${WORK_FOLDER}"
+
+cd "${KEYCLOAK_IMAGE_PATH}"
+
+docker build . -t "${KEYCLOAK_INSTANCE_IMAGE}"
+docker push "${KEYCLOAK_INSTANCE_IMAGE}"
+
 cd "${WORK_FOLDER}"
 
 setup-postgres-on-k3d-user -u keycloak -p keycloak
@@ -35,6 +44,8 @@ EOF
 openssl x509 -req -in keycloak.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out keycloak.crt -days 3650 -sha256 -extfile keycloak.v3.ext
 
 kubectl kustomize "${KEYCLOAK_FLUX_PATH}/keycloak/${KEYCLOAK_VERSION}" -o "./operator.yaml"
+envsubst < "./operator.yaml" > "./operator.substituted.yaml"
+cat "./operator.substituted.yaml" | grep "value:"
 
 cat <<EOF > ./namespace.yaml
 apiVersion: v1
@@ -47,7 +58,7 @@ EOF
 kubectl apply -f ./namespace.yaml
 
 kubectl create secret tls example-tls-secret --cert keycloak.crt --key keycloak.key -n keycloak
-kubectl apply -f "./operator.yaml" -n keycloak
+kubectl apply -f "./operator.substituted.yaml" -n keycloak
 
 
 cat <<EOF > ./secret.yaml
@@ -122,6 +133,46 @@ spec:
 EOF
 kubectl apply -f ./ingress.yaml
 
+cat <<EOF > role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keycloak-awms
+rules:
+  - apiGroups:
+      - xlscsde.nhs.uk
+    resources:
+      - analyticsworkspaces
+      - analyticsworkspacebindings
+    verbs:
+      - get
+      - list
+
+  - apiGroups:
+      - xlscsde.nhs.uk
+    resources:
+      - analyticsworkspacebindings
+      - analyticsworkspaces/status
+      - analyticsworkspacebindings/status
+      - analyticsworkspaces/scale
+      - analyticsworkspacebindings/scale
+    verbs:
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: keycloak-awms-binding
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: keycloak-awms
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: keycloak
+EOF
+kubectl apply -f ./role.yaml
 
 nohup kubectl port-forward svc/default-instance-service -n keycloak 443:8443 &
 

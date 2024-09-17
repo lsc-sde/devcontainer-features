@@ -11,14 +11,23 @@
         },
         "keycloakVersion" : {
             "type" : "string",
-            "default" : "23.0.4"
+            "default" : "25.0.4"
         },
         "keycloakNamespace" : {
             "type" : "string",
             "default" : "keycloak"
+        },
+        "imageName" : {
+            "type" : "string",
+            "default" : "k3d-devcontainer-registry.local:36471/keycloak"
+        },
+        "imagePath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/products/sde-3rd-party/keycloak/awms-keycloak-extensions"
         }
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/temurin",
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
         "ghcr.io/lsc-sde/devcontainer-features/nginx"

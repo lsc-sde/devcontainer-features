@@ -74,7 +74,8 @@ hub:
       - 'profile'
       - 'realm_groups'
       
-      username_key: preferred_username
+      username_claim: workspace_id
+      username_key: workspace_id
       userdata_params:
         state: state
         realm_groups: groups

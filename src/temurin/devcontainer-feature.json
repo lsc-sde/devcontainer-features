@@ -1,0 +1,15 @@
+{
+    "id": "temurin",
+    "version": "0.1.0",
+    "name": "temurin",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/temurin.html",
+    "description": "Installs temurin into the devcontainer",
+    "options": {
+        "temurinVersion" : {
+            "type" : "string",
+            "default" : "21"
+        }
+    },
+    "installsAfter" :[
+    ]
+}

@@ -2,7 +2,7 @@
 
 usage() { echo "Usage: $0 [-p <path_to_flux_folder>] [-v <keycloak_version>] [-n <keycloak_namespace>]" 1>&2; exit 1; }
 
-while getopts ":p:v:n:" o; do
+while getopts ":p:v:n:i:P:" o; do
     case "${o}" in
         p)
             FLUXPATH=${OPTARG}
@@ -12,6 +12,12 @@ while getopts ":p:v:n:" o; do
             ;;
         n)
             KEYCLOAKNAMESPACE=${OPTARG}
+            ;;
+        i)
+            IMAGENAME=${OPTARG}
+            ;;
+        P)
+            IMAGEPATH=${OPTARG}
             ;;
         *)
             usage
@@ -30,10 +36,12 @@ cat <<EOF > /usr/lib/keycloak/etc/environment
 KEYCLOAK_FLUX_PATH="${FLUXPATH}"
 KEYCLOAK_VERSION="${KEYCLOAKVERSION}"
 KEYCLOAK_NAMESPACE="${KEYCLOAKNAMESPACE}"
+KEYCLOAK_IMAGE="${IMAGENAME}"
+KEYCLOAK_IMAGE_PATH="${IMAGEPATH}"
 EOF
 
 cp -R ./bin /usr/lib/keycloak/
 
-ln -s /usr/lib/keycloak/bin/setup-keycloak.sh /bin/setup-keycloak
+ln -s /usr/lib/keycloak/bin/setup-keycloak /bin/setup-keycloak
 
 exit 0
