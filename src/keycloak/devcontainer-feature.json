@@ -1,0 +1,35 @@
+{
+    "id": "keycloak",
+    "version": "0.1.0",
+    "name": "keycloak",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/keycloak.html",
+    "description": "Installs keycloak into the devcontainer's k3s cluster",
+    "options": {
+        "fluxPath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/flux/keycloak"
+        },
+        "keycloakVersion" : {
+            "type" : "string",
+            "default" : "25.0.4"
+        },
+        "keycloakNamespace" : {
+            "type" : "string",
+            "default" : "keycloak"
+        },
+        "imageName" : {
+            "type" : "string",
+            "default" : "k3d-devcontainer-registry.local:36471/keycloak"
+        },
+        "imagePath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/products/sde-3rd-party/keycloak/awms-keycloak-extensions"
+        }
+    },
+    "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/temurin",
+        "ghcr.io/lsc-sde/devcontainer-features/k3d",
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/nginx"
+    ]
+}

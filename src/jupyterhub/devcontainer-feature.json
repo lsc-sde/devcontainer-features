@@ -1,6 +1,6 @@
 {
     "id": "jupyterhub",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "jupyterhub",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/jupyterhub.html",
     "description": "Installs the JupyterHub into the devcontainer's k3s cluster",
@@ -41,6 +41,9 @@
     "installsAfter" :[
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/metallb",
-        "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/nginx",
+        "ghcr.io/lsc-sde/devcontainer-features/keycloak",
+        "ghcr.io/lsc-sde/devcontainer-features/trust-manager"
     ]
 }

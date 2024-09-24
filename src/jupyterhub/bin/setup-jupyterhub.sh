@@ -15,11 +15,37 @@ docker build . -t "${IMAGE_NAME}:${IMAGE_TAG}" "$@"
 echo "pushing docker image ${IMAGE_NAME}:${IMAGE_TAG} to local registry"
 docker push "${IMAGE_NAME}:${IMAGE_TAG}"
 
-cd "${CURRENT_FOLDER}"
+cd "${WORK_FOLDER}"
+
+
+openssl req -new -nodes -out jupyter.csr -newkey rsa:4096 -keyout jupyter.key -subj '/CN=jupyter/C=GB/ST=Anywhere/L=Anywhere/O=LSCSDE'
+
+cat <<EOF > jupyter.v3.ext 
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = jupyter.xlscsde.local
+EOF
+
+openssl x509 -req -in jupyter.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out jupyter.crt -days 3650 -sha256 -extfile jupyter.v3.ext
+
 
 echo "Installing Helm Chart ${CHART_NAME}:${CHART_VERSION} from ${HELM_REPOSITORY} to namespace ${NAMESPACE}"
 helm repo add jupyterhub "${HELM_REPOSITORY}"
 helm repo update
+
+
+cat <<EOF > ./namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+  labels:
+    xlscsde.local/inject: "enabled"
+EOF
+kubectl apply -f ./namespace.yaml
 
 cat <<EOF > ./jupyterhub.values.yaml
 hub:
@@ -31,6 +57,53 @@ hub:
     DEFAULT_STORAGE_CLASS: "jupyter-default"
     DEFAULT_STORAGE_ACCESS_MODES: "ReadWriteOnce"
     DEFAULT_STORAGE_CAPACITY: "1Gi"
+
+  config:
+    GenericOAuthenticator:
+      client_id: jupyter
+      client_secret: jupyter
+      keycloak_api_base_url: https://keycloak.xlscsde.local/admin/realms/lsc-sde
+      oauth_callback_url: ""
+      authorize_url: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/auth
+      token_url: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/token
+      userdata_url: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/userinfo
+      logout_redirect_url: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/logout
+      login_service: keycloak
+      scope: 
+      - 'openid'
+      - 'profile'
+      - 'realm_groups'
+      
+      username_claim: workspace_id
+      username_key: workspace_id
+      userdata_params:
+        state: state
+        realm_groups: groups
+
+      admin_groups:
+      - jupyter-admins
+
+      allowed_groups: 
+      - jupyter-users
+
+      claim_groups_key: groups
+
+    JupyterHub:
+      authenticator_class: generic-oauth
+  
+  extraVolumes:
+  - name: jupyterhub-certificates
+    configMap:
+      name: xlscsde-local-bundle
+      defaultMode: 0644
+
+  extraVolumeMounts:
+  - name: jupyterhub-certificates
+    mountPath: /etc/ssl/certs
+    readOnly: true
+proxy:
+  service:
+    type: ClusterIP
 EOF
 
 
@@ -39,7 +112,6 @@ install_cmd+=( -n "${NAMESPACE}" )
 install_cmd+=( jh-test )
 install_cmd+=( "jupyterhub/${CHART_NAME}" )
 install_cmd+=( --version ${CHART_VERSION} )
-install_cmd+=( --create-namespace )
 install_cmd+=( -f ./jupyterhub.values.yaml )
 echo "Executing ${install_cmd[@]}"
 ${install_cmd[@]}
@@ -48,6 +120,35 @@ helm upgrade -i -n awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" --crea
 
 cd "${WORK_FOLDER}"
 cat <<EOF > bindings.yaml
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: events-writer
+rules:
+- apiGroups:
+  - events.events.k8s.io
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jh-test:events-writer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: events-writer
+subjects:
+- kind: ServiceAccount
+  name: hub
+  namespace: jh-test
+
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -255,6 +356,39 @@ spec:
   expires: "2025-01-01"
 EOF
 kubectl apply -f workspace-bindings.yaml
+
+cat <<EOF > ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jupyter
+  namespace: jh-test
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect : "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect : "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jupyter.xlscsde.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: proxy-public
+            port: 
+              name: http
+  tls:
+  - hosts:
+    - jupyter.xlscsde.local
+    secretName: example-tls-secret
+EOF
+
+kubectl create secret tls example-tls-secret --cert jupyter.crt --key jupyter.key -n jh-test
+
+kubectl apply -f ./ingress.yaml
 
 nohup kubectl port-forward svc/proxy-public -n jh-test 8080:80 &
 cd "${CURRENT_FOLDER}"

@@ -1,0 +1,145 @@
+#!/bin/bash
+
+sudo chmod 0777 /var/lib/rancher/k3s/storage
+
+. /etc/k3d/setup/environment
+. /usr/lib/apache-guacamole/etc/environment
+. /usr/lib/postgres-on-k3d/etc/environment
+
+echo "Setting up apache-guacamole"
+echo "GUAC_HELM_REPOSITORY = ${GUAC_HELM_REPOSITORY}"
+echo "GUAC_VERSION = ${GUAC_VERSION}"
+echo "GUAC_NAMESPACE = ${GUAC_NAMESPACE}"
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/apache-guacamole/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+
+mkdir -p "${WORK_FOLDER}"
+cd "${WORK_FOLDER}"
+
+setup-postgres-on-k3d-user -u guacamole -p guacamole
+setup-postgres-on-k3d-database -n guacamole -o guacamole
+
+cat <<EOF > ./namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${GUAC_NAMESPACE}
+EOF
+kubectl apply -f ./namespace.yaml
+
+helm repo add guacamole "${GUAC_HELM_REPOSITORY}"
+helm repo update
+
+openssl req -new -nodes -out guacamole.csr -newkey rsa:4096 -keyout guacamole.key -subj '/CN=guacamole/C=GB/ST=Anywhere/L=Anywhere/O=LSCSDE'
+
+cat <<EOF > guacamole.v3.ext 
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = guacamole.xlscsde.local
+EOF
+
+openssl x509 -req -in guacamole.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out guacamole.crt -days 3650 -sha256 -extfile guacamole.v3.ext
+
+
+cat <<EOF > ./namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${GUAC_NAMESPACE}
+  labels:
+    xlscsde.local/inject: "enabled"
+EOF
+kubectl apply -f ./namespace.yaml
+
+kubectl create secret tls example-tls-secret --cert guacamole.crt --key guacamole.key -n "${GUAC_NAMESPACE}"
+
+cat <<EOF > secret.yaml
+apiVersion: v1
+data:
+  db-password: Z3VhY2Ftb2xl
+kind: Secret
+metadata:
+  name: guacamole
+  namespace: ${GUAC_NAMESPACE}
+type: Opaque
+EOF
+kubectl apply -f ./secret.yaml
+
+cat <<EOF > config.yaml
+portal:
+  ingress:
+    host: guacamole.xlscsde.local
+    tls:
+      enabled: true
+      secretName: example-tls-secret
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect : "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect : "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: 64m
+      nginx.ingress.kubernetes.io/app-root: /guacamole 
+
+
+  volumeMounts:
+  - name: guacamole-certificates
+    mountPath: /etc/ssl/certs
+    readOnly: true
+
+  volumes:
+  - name: guacamole-certificates
+    configMap:
+      name: xlscsde-local-bundle
+      defaultMode: 0644
+  
+  env:
+    - name: JAVA_OPTS
+      value: "-Djavax.net.ssl.trustStore=\"/etc/ssl/certs/bundle.jks\" -Djavax.net.ssl.trustStorePassword=\"changeit\""
+    - name: OPENID_AUTHORIZATION_ENDPOINT
+      value: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/auth
+    - name: OPENID_JWKS_ENDPOINT
+      value: https://keycloak.xlscsde.local/realms/lsc-sde/protocol/openid-connect/certs
+    - name: OPENID_ISSUER
+      value: https://keycloak.xlscsde.local/realms/lsc-sde
+    - name: OPENID_CLIENT_ID
+      value: guacamole
+    - name: OPENID_REDIRECT_URI
+      value: "https://guacamole.xlscsde.local"
+    - name: EXTENSION_PRIORITY
+      value: "openid"
+    - name: OPENID_SCOPE
+      value: "openid email realm_groups profile"
+    - name: OPENID_USERNAME_CLAIM_TYPE 
+      value: workspace_id
+    - name: USE_SYSTEM_CA_CERTS
+      value: "true"
+database:
+  type: postgres
+  hostname: "${PG_FQDN}"
+  port: "5432"
+  database: "guacamole"
+  user: "guacamole"
+  password:
+    secret: "guacamole"
+    key: "db-password"
+EOF
+
+helm upgrade guacamole --install guacamole/guacamole -n "${GUAC_NAMESPACE}" --version "${GUAC_VERSION}" -f config.yaml
+
+export OPERATOR_INSTANCE_IMAGE="k3d-devcontainer-registry.local:36471/awms-guacamole-operator:${CURRENT_DATE}"
+
+docker build /workspaces/lsc-sde/products/sde/analytics-workspace-management/awms-guacamole-operator -t "${OPERATOR_INSTANCE_IMAGE}"
+docker push "${OPERATOR_INSTANCE_IMAGE}"
+
+cat <<EOF > config.operator.yaml
+image: ${OPERATOR_INSTANCE_IMAGE}
+EOF
+
+helm upgrade -i -n "${GUAC_NAMESPACE}" awms-guacamole-operator /workspaces/lsc-sde/products/sde/analytics-workspace-management/awms-guacamole-operator/helm -f config.operator.yaml
+
+cd "${CURRENT_FOLDER}"
+
+exit 0
