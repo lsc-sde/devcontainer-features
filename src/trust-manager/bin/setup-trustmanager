@@ -66,8 +66,28 @@ spec:
     namespaceSelector:
       matchLabels:
         xlscsde.local/inject: "enabled"
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: xlscsde-enterprise-certificate
+spec:
+  sources:
+  - secret:
+      name: root-certificate
+      key: ca.crt
+  target:
+    configMap:
+      key: "enterprise.crt" 
+    additionalFormats:
+      jks:
+        key: "enterprise.jks"
+      pkcs12:
+        key: "enterprise.p12"
+    namespaceSelector:
+      matchLabels:
+        xlscsde.local/inject: "enabled"
 EOF
-
 kubectl apply -f ./bundle.yaml
 
 cd "${CURRENT_FOLDER}"

@@ -45,7 +45,6 @@ openssl x509 -req -in keycloak.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey
 
 kubectl kustomize "${KEYCLOAK_FLUX_PATH}/keycloak/${KEYCLOAK_VERSION}" -o "./operator.yaml"
 envsubst < "./operator.yaml" > "./operator.substituted.yaml"
-cat "./operator.substituted.yaml" | grep "value:"
 
 cat <<EOF > ./namespace.yaml
 apiVersion: v1
