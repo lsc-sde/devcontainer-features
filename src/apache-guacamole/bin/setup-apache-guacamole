@@ -21,6 +21,16 @@ cd "${WORK_FOLDER}"
 setup-postgres-on-k3d-user -u guacamole -p guacamole
 setup-postgres-on-k3d-database -n guacamole -o guacamole
 
+export PGPASSWORD="guacamole"
+DBPOPULATED=$(psql -h 127.0.0.1 -U guacamole --csv -t -c "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public' and tablename = 'guacamole_connection_group_type';")
+
+if [ "${DBPOPULATED}" == "guacamole_connection_group_type" ]; then
+  echo "database already appears to be populated, nothing to do"
+else
+  echo "database not populated, populating from db"
+  psql -h 127.0.0.1 -U guacamole -f "/usr/lib/apache-guacamole/db/database.sql"
+fi
+
 cat <<EOF > ./namespace.yaml
 apiVersion: v1
 kind: Namespace
