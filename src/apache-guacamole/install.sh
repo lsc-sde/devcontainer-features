@@ -22,6 +22,7 @@ shift $((OPTIND-1))
 
 
 mkdir -p /usr/lib/apache-guacamole/bin
+mkdir -p /usr/lib/apache-guacamole/db
 mkdir -p /usr/lib/apache-guacamole/etc
 mkdir -p /usr/lib/apache-guacamole/work
 chmod 0777 /usr/lib/apache-guacamole/work
@@ -33,6 +34,7 @@ GUAC_NAMESPACE="${GUACNAMESPACE}"
 EOF
 
 cp -R ./bin /usr/lib/apache-guacamole/
+cp -R ./db /usr/lib/apache-guacamole/
 
 ln -s /usr/lib/apache-guacamole/bin/setup-apache-guacamole /bin/setup-apache-guacamole
 
