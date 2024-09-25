@@ -1,6 +1,6 @@
 {
     "id": "apache-guacamole",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "apache-guacamole",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/apache-guacamole.html",
     "description": "Installs Apache Guacamole into the devcontainer's k3s cluster",
@@ -20,7 +20,7 @@
     },
     "installsAfter" :[
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
-        "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
-    ],
-	"postCreateCommand": "setup-nginx"
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/nginx"
+    ]
 }
