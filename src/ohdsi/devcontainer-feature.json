@@ -1,6 +1,6 @@
 {
     "id": "ohdsi",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "ohdsi",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/ohdsi.html",
     "description": "Installs the OHDSI into the devcontainer's k3s cluster",
@@ -17,6 +17,7 @@
     "installsAfter" :[
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/metallb",
-        "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/nginx"
     ]
 }

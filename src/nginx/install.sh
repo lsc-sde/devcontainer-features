@@ -34,6 +34,6 @@ EOF
 
 cp -R ./bin /usr/lib/nginx/
 
-ln -s /usr/lib/nginx/bin/setup-nginx.sh /bin/setup-nginx
+ln -s /usr/lib/nginx/bin/setup-nginx /bin/setup-nginx
 
 exit 0
