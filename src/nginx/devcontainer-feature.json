@@ -1,6 +1,6 @@
 {
     "id": "nginx",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "nginx",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/nginx.html",
     "description": "Installs NGINX into the devcontainer's k3s cluster",
