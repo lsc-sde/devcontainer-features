@@ -30,6 +30,16 @@ cd "${WORK_FOLDER}"
 setup-postgres-on-k3d-user -u keycloak -p keycloak
 setup-postgres-on-k3d-database -n keycloak -o keycloak
 
+export PGPASSWORD="keycloak"
+DBPOPULATED=$(psql -h 127.0.0.1 -U keycloak --csv -t -c "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public' and tablename = 'admin_event_entity';")
+
+if [ "${DBPOPULATED}" == "admin_event_entity" ]; then
+  echo "database already appears to be populated, nothing to do"
+else
+  echo "database not populated, populating from db"
+  psql -h 127.0.0.1 -U keycloak -f "/usr/lib/keycloak/db/database.sql"
+fi
+
 openssl req -new -nodes -out keycloak.csr -newkey rsa:4096 -keyout keycloak.key -subj '/CN=Keycloak/C=GB/ST=Anywhere/L=Anywhere/O=LSCSDE'
 
 cat <<EOF > keycloak.v3.ext 

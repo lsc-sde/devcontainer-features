@@ -28,6 +28,7 @@ shift $((OPTIND-1))
 
 
 mkdir -p /usr/lib/keycloak/bin
+mkdir -p /usr/lib/keycloak/db
 mkdir -p /usr/lib/keycloak/etc
 mkdir -p /usr/lib/keycloak/work
 chmod 0777 /usr/lib/keycloak/work
@@ -41,6 +42,7 @@ KEYCLOAK_IMAGE_PATH="${IMAGEPATH}"
 EOF
 
 cp -R ./bin /usr/lib/keycloak/
+cp -R ./db /usr/lib/keycloak/
 
 ln -s /usr/lib/keycloak/bin/setup-keycloak /bin/setup-keycloak
 
