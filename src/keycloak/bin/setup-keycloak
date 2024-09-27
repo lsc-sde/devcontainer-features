@@ -12,6 +12,9 @@ echo "KEYCLOAK_FLUX_PATH = ${KEYCLOAK_FLUX_PATH}"
 echo "KEYCLOAK_VERSION = ${KEYCLOAK_VERSION}"
 echo "KEYCLOAK_IMAGE = ${KEYCLOAK_IMAGE}"
 
+export dns_prefix=""
+export private_dnz_zone="xlscsde.local"
+
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
 export KEYCLOAK_INSTANCE_IMAGE="${KEYCLOAK_IMAGE}:${CURRENT_DATE}"
@@ -31,6 +34,7 @@ setup-postgres-on-k3d-user -u keycloak -p keycloak
 setup-postgres-on-k3d-database -n keycloak -o keycloak
 
 export PGPASSWORD="keycloak"
+export PG_FQDN
 DBPOPULATED=$(psql -h 127.0.0.1 -U keycloak --csv -t -c "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public' and tablename = 'admin_event_entity';")
 
 if [ "${DBPOPULATED}" == "admin_event_entity" ]; then
@@ -53,7 +57,7 @@ EOF
 
 openssl x509 -req -in keycloak.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out keycloak.crt -days 3650 -sha256 -extfile keycloak.v3.ext
 
-kubectl kustomize "${KEYCLOAK_FLUX_PATH}/keycloak/${KEYCLOAK_VERSION}" -o "./operator.yaml"
+kubectl kustomize "${KEYCLOAK_FLUX_PATH}/cluster/local" -o "./operator.yaml"
 envsubst < "./operator.yaml" > "./operator.substituted.yaml"
 
 cat <<EOF > ./namespace.yaml
@@ -66,9 +70,7 @@ metadata:
 EOF
 kubectl apply -f ./namespace.yaml
 
-kubectl create secret tls example-tls-secret --cert keycloak.crt --key keycloak.key -n keycloak
-kubectl apply -f "./operator.substituted.yaml" -n keycloak
-
+kubectl create secret tls "${dns_prefix}keycloak.${private_dnz_zone}-tls" --cert keycloak.crt --key keycloak.key -n keycloak
 
 cat <<EOF > ./secret.yaml
 apiVersion: v1
@@ -82,108 +84,8 @@ metadata:
 type: Opaque
 EOF
 kubectl apply -f ./secret.yaml
+kubectl apply -f "./operator.substituted.yaml" -n keycloak
 
-cat <<EOF > ./instance.yaml
-apiVersion: k8s.keycloak.org/v2alpha1
-kind: Keycloak
-metadata:
-  name: default-instance
-  namespace: keycloak
-spec:
-  instances: 1
-  db:
-    vendor: postgres
-    database: keycloak
-    host: ${PG_FQDN}
-    usernameSecret:
-      name: keycloak-db-secrets
-      key: db_username
-    passwordSecret:
-      name: keycloak-db-secrets
-      key: db_password
-  hostname:
-    hostname: keycloak.xlscsde.local
-  http:
-    tlsSecret: example-tls-secret
-  ingress:
-    enabled: false
-EOF
-
-kubectl apply -f ./instance.yaml
-
-cat <<EOF > ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: default-keycloak-instance
-  namespace: keycloak
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect : "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect : "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    nginx.ingress.kubernetes.io/proxy-body-size: 64m
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: keycloak.xlscsde.local
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: default-instance-service
-            port: 
-              name: https
-  tls:
-  - hosts:
-    - keycloak.xlscsde.local
-    secretName: example-tls-secret
-EOF
-kubectl apply -f ./ingress.yaml
-
-cat <<EOF > role.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: keycloak-awms
-rules:
-  - apiGroups:
-      - xlscsde.nhs.uk
-    resources:
-      - analyticsworkspaces
-      - analyticsworkspacebindings
-    verbs:
-      - get
-      - list
-
-  - apiGroups:
-      - xlscsde.nhs.uk
-    resources:
-      - analyticsworkspacebindings
-      - analyticsworkspaces/status
-      - analyticsworkspacebindings/status
-      - analyticsworkspaces/scale
-      - analyticsworkspacebindings/scale
-    verbs:
-      - patch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: keycloak-awms-binding
-roleRef:
-  kind: ClusterRole
-  apiGroup: rbac.authorization.k8s.io
-  name: keycloak-awms
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: keycloak
-EOF
-kubectl apply -f ./role.yaml
-
-nohup kubectl port-forward svc/default-instance-service -n keycloak 443:8443 &
 
 cd "${CURRENT_FOLDER}"
 
