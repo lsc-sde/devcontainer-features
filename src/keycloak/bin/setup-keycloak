@@ -14,7 +14,7 @@ echo "KEYCLOAK_IMAGE = ${KEYCLOAK_IMAGE}"
 
 export dns_prefix=""
 export private_dnz_zone="xlscsde.local"
-
+export keycloak_namespace="${KEYCLOAK_NAMESPACE}"
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
 export KEYCLOAK_INSTANCE_IMAGE="${KEYCLOAK_IMAGE}:${CURRENT_DATE}"

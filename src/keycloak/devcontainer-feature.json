@@ -1,6 +1,6 @@
 {
     "id": "keycloak",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "keycloak",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/keycloak.html",
     "description": "Installs keycloak into the devcontainer's k3s cluster",
