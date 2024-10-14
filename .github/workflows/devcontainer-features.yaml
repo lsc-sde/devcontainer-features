@@ -8,6 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  semver:
+    uses: lsc-sde/lsc-sde/.github/workflows/semver.yaml@main
+    with:
+      useConfigFile: true
+
   publish:
     runs-on: ubuntu-latest
     permissions:
