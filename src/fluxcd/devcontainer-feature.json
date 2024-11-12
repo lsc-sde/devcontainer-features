@@ -2,7 +2,7 @@
     "id": "fluxcd",
     "version": "0.1.1",
     "name": "fluxcd",
-    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/fluxcd.html",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/fluxcd/docs/feature.html",
     "description": "Installs fluxcd onto the devcontainer",
     "options": {
     },

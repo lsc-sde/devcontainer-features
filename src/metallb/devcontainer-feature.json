@@ -2,7 +2,7 @@
     "id": "metallb",
     "version": "0.1.0",
     "name": "metallb",
-    "documentationURL": "https://github.com/lsc-sde/lsc-sde/features/tree/main/features/metallb",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/metallb/docs/feature.html",
     "description": "Installs MetalLB onto the devcontainer",
     "options": {
     },

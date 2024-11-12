@@ -2,7 +2,7 @@
     "id": "kustomize",
     "version": "0.1.0",
     "name": "kustomize",
-    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/kustomize.html",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/kustomize/docs/feature.html",
     "description": "Installs kustomize into the devcontainer",
     "options": {
         "kustomizeInstallUrl" : {

@@ -2,7 +2,7 @@
     "id": "apache-guacamole",
     "version": "0.1.3",
     "name": "apache-guacamole",
-    "documentationURL": "https://lsc-sde.github.io/lsc-sde/Secure-Data-Environment/Developers/Devcontainer/Features/apache-guacamole.html",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/apache-guacamole/docs/feature.html",
     "description": "Installs Apache Guacamole into the devcontainer's k3s cluster",
     "options": {
         "helmRepository" : {
