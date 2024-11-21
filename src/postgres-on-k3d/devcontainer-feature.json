@@ -2,7 +2,7 @@
     "id": "postgres-on-k3d",
     "version": "0.1.6",
     "name": "postgres-on-k3d",
-    "documentationURL": https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/postgres-on-k3d/docs/feature.html",
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/postgres-on-k3d/docs/feature.html",
     "description": "Installs the PostgreSQL into the devcontainer's k3s cluster",
     "options": {
         "helmRepository" : {
