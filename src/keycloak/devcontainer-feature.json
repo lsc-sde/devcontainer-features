@@ -1,13 +1,13 @@
 {
     "id": "keycloak",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "name": "keycloak",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/keycloak/docs/feature.html",
     "description": "Installs keycloak into the devcontainer's k3s cluster",
     "options": {
         "fluxPath" : {
             "type" : "string",
-            "default" : "/workspaces/lsc-sde/products/sde-3rd-party/keycloak/iac-flux-keycloak/keycloak"
+            "default" : "/workspaces/lsc-sde/products/sde-3rd-party/keycloak/iac-flux-keycloak"
         },
         "keycloakVersion" : {
             "type" : "string",
