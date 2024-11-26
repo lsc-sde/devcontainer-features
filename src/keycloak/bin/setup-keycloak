@@ -18,7 +18,7 @@ export keycloak_namespace="${KEYCLOAK_NAMESPACE}"
 export keycloak_image="${KEYCLOAK_IMAGE}"
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
-export KEYCLOAK_INSTANCE_IMAGE="${KEYCLOAK_IMAGE}:${CURRENT_DATE}"
+export KEYCLOAK_INSTANCE_IMAGE="${REGISTRY_NAME}:${REGISTRY_PORT}/${KEYCLOAK_IMAGE}:${CURRENT_DATE}"
 WORK_FOLDER="/usr/lib/keycloak/work/${CURRENT_DATE}"
 CURRENT_FOLDER=$(pwd)
 

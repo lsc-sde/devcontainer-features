@@ -1,6 +1,6 @@
 {
     "id": "jupyterhub",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "name": "jupyterhub", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/jupyterhub/docs/feature.html",
     "description": "Installs the JupyterHub into the devcontainer's k3s cluster",
@@ -23,7 +23,7 @@
         },
         "imageName" : {
             "type" : "string",
-            "default" : "k3d-devcontainer-registry.local:36471/jupyterhub"
+            "default" : "jupyterhub"
         },
         "imageTag" : {
             "type" : "string",

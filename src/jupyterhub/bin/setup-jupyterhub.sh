@@ -1,19 +1,23 @@
 #!/bin/bash
 
+. /etc/k3d/setup/environment
 . /usr/lib/jupyterhub/etc/environment
 
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
 WORK_FOLDER="/usr/lib/jupyterhub/work/${CURRENT_DATE}"
 CURRENT_FOLDER=$(pwd)
 
+export FULL_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/${IMAGE_NAME}:${CURRENT_DATE}"
+
+
 mkdir -p "${WORK_FOLDER}"
 
 echo "Building docker image based on definition in: ${HUB_DOCKER_IMAGE_DEFINITION}"
 cd "${HUB_DOCKER_IMAGE_DEFINITION}"
-docker build . -t "${IMAGE_NAME}:${IMAGE_TAG}" "$@"
+docker build . -t "${FULL_IMAGE_NAME}" "$@"
 
-echo "pushing docker image ${IMAGE_NAME}:${IMAGE_TAG} to local registry"
-docker push "${IMAGE_NAME}:${IMAGE_TAG}"
+echo "pushing docker image ${FULL_IMAGE_NAME} to local registry"
+docker push "${FULL_IMAGE_NAME}"
 
 cd "${WORK_FOLDER}"
 
@@ -50,8 +54,8 @@ kubectl apply -f ./namespace.yaml
 cat <<EOF > ./jupyterhub.values.yaml
 hub:
   image:
-    name: ${IMAGE_NAME}
-    tag: ${IMAGE_TAG}
+    name: ${REGISTRY_NAME}:${REGISTRY_PORT}/${IMAGE_NAME}
+    tag: ${CURRENT_DATE}
     pullPolicy: Always
   extraEnv:
     DEFAULT_STORAGE_CLASS: "jupyter-default"

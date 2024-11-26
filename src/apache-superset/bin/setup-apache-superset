@@ -6,8 +6,8 @@
 CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
 WORK_FOLDER="/usr/lib/apache-superset/work/${CURRENT_DATE}"
 CURRENT_FOLDER=$(pwd)
-IMAGE_NAME="k3d-${CLUSTERNAME}-registry.local:${REGISTRY_PORT}/apache/superset"
-IMAGE_TAG="local"
+IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/apache/superset"
+IMAGE_TAG="${CURRENT_DATE}"
 CONTAINER_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
 
 
