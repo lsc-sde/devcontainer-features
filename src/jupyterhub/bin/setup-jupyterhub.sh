@@ -55,7 +55,7 @@ cat <<EOF > ./jupyterhub.values.yaml
 hub:
   image:
     name: ${REGISTRY_NAME}:${REGISTRY_PORT}/${IMAGE_NAME}
-    tag: ${CURRENT_DATE}
+    tag: "${CURRENT_DATE}"
     pullPolicy: Always
   extraEnv:
     DEFAULT_STORAGE_CLASS: "jupyter-default"
