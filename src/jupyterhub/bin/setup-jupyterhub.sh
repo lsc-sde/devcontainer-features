@@ -131,7 +131,7 @@ metadata:
   name: events-writer
 rules:
 - apiGroups:
-  - events.events.k8s.io
+  - events.k8s.io
   - ""
   resources:
   - events
