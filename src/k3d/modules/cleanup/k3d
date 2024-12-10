@@ -1,5 +1,3 @@
-#!/bin/bash
-
 . /etc/k3d/setup/environment
 
 CLUSTER_LIST=$(k3d cluster list "${CLUSTERNAME}")

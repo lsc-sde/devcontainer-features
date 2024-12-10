@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cp ./bin/* /bin/
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
 
 mkdir -p /etc/k3d/setup
 

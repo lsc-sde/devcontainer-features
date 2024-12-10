@@ -1,6 +1,6 @@
 {
     "id": "k3d",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "k3d",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/k3d/docs/feature.html",
     "description": "Installs k3d onto the devcontainer",
@@ -39,7 +39,8 @@
         }
     },
     "installsAfter" :[
-        "ghcr.io/devcontainers/features/docker-in-docker"
+        "ghcr.io/devcontainers/features/docker-in-docker",
+        "ghcr.io/devcontainers/features/krapctl"
     ],
-	"postCreateCommand": "setup-k3d"
+	"postCreateCommand": "krapctl setup k3d"
 }

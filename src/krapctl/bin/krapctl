@@ -1,0 +1,77 @@
+#!/bin/bash
+
+. /etc/krapctl/environment
+
+KRAPCTL_COMMAND=""
+
+format_command_usage() {
+    ITEM_NAME=$(basename $1)
+    DESCRIPTION="No description provided"
+
+    if [ -f "$1.description" ]; then
+        DESCRIPTION=$(cat "$1.description")
+    fi
+
+    if [ -d "$1" ]; then
+        printf "%10s\t%s\n" $ITEM_NAME "$DESCRIPTION"
+    elif [[ "${ITEM_NAME}" == *.description ]]; then
+        echo -n ""
+    else
+        printf "%10s\t%s\n" $ITEM_NAME "$DESCRIPTION"
+    fi
+}
+
+krapctl_usage() { 
+    if [ -n "${KRAPCTL_COMMAND}" ]; then
+        echo "Usage: $0 ${KRAPCTL_COMMAND} <subcommand>"; 
+        echo ""
+        echo "Available subcommands for ${KRAPCTL_COMMAND}:"
+    else
+        echo "Usage: $0 <command> <subcommand>"; 
+        echo ""
+        echo "Available commands:"
+    fi
+    
+    for ITEM_PATH in $KRAPCTL_MODULES/* ; do
+        format_command_usage $ITEM_PATH
+    done
+    
+
+    exit 1; 
+}
+
+
+
+krapctl_command(){
+    # echo "KRAPCTL_MODULES = ${KRAPCTL_MODULES}"
+    if [ "$#" -eq 0 ]; then
+        krapctl_usage
+    fi
+    if [ -n "$1" ]; then 
+        for ITEM_PATH in $KRAPCTL_MODULES/* ; do
+            ITEM_NAME=$(basename $ITEM_PATH)
+
+            if [[ "${ITEM_NAME}" == "$1" ]]; then
+                if [ -d $ITEM_PATH ]; then
+                    shift
+                    KRAPCTL_MODULES="${ITEM_PATH}"
+                    if [ -n "${KRAPCTL_COMMAND}" ]; then
+                        KRAPCTL_COMMAND="${KRAPCTL_COMMAND} ${ITEM_NAME}"
+                    else
+                        KRAPCTL_COMMAND="${ITEM_NAME}"
+                    fi
+                    krapctl_command $@          
+                else
+                    . $ITEM_PATH
+                fi
+                exit 0
+            fi
+        done
+
+        echo -e "\e[31mCommand $1 not found\e[0m\n" 1>&2; 
+        krapctl_usage
+    fi
+
+}
+
+krapctl_command $@

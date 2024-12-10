@@ -1,0 +1,1 @@
+echo "Current Version is ${KRAPCTL_VERSION}"
