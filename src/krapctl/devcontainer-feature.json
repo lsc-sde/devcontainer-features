@@ -7,7 +7,6 @@
     "options": {
     },
     "installsAfter" :[
-        "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
         "ghcr.io/lsc-sde/devcontainer-features/aks-tools"
     ]
