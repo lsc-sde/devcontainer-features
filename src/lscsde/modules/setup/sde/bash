@@ -1,5 +1,3 @@
-#!/bin/bash
-
 . /etc/lscsde/setup/environment
 
 cat <<EOF >> ~/.bashrc

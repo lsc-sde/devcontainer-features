@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cp ./bin/* /bin/
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
 
 mkdir -p /etc/lscsde/setup
 

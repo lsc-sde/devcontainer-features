@@ -1,6 +1,6 @@
 {
     "id": "lscsde",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "lscsde",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/lscsde/docs/feature.html",
     "description": "Installs lscsde onto the devcontainer",
@@ -27,5 +27,5 @@
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
         "ghcr.io/lsc-sde/devcontainer-features/aks-tools"
     ],
-	"postStartCommand": "setup-terminal-lscsde"
+	"postStartCommand": "krapctl setup sde terminal"
 }

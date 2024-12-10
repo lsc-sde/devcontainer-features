@@ -1,5 +1,3 @@
-#!/bin/bash
-
 . /etc/lscsde/setup/environment
 
 echo "Setting up secrets for LSC-SDE"
@@ -9,28 +7,28 @@ fi
 
 if [ ! -f "${SECRETS_PATH}/HadesPassword" ]; then
     echo "Generating HadesPassword"
-    generate-password-lscsde -m 12 > "${SECRETS_PATH}/HadesPassword"
+    krapctl tools generate-password -m 12 > "${SECRETS_PATH}/HadesPassword"
 else 
     echo "HadesPassword Already Exists"
 fi
 
 if [ ! -f "${SECRETS_PATH}/GuacDbPassword" ]; then
     echo "Generating GuacDbPassword"
-    generate-password-lscsde -m 12 > "${SECRETS_PATH}/GuacDbPassword"
+    krapctl tools generate-password -m 12 > "${SECRETS_PATH}/GuacDbPassword"
 else 
     echo "GuacDbPassword Already Exists"
 fi
 
 if [ ! -f "${SECRETS_PATH}/JupyterCookieSecret" ]; then
     echo "Generating JupyterCookieSecret"
-    generate-password-lscsde -m 12 -h > "${SECRETS_PATH}/JupyterCookieSecret"
+    krapctl tools generate-password -m 12 -h > "${SECRETS_PATH}/JupyterCookieSecret"
 else 
     echo "JupyterCookieSecret Already Exists"
 fi
 
 if [ ! -f "${SECRETS_PATH}/OhdsiDbPassword" ]; then
     echo "Generating OhdsiDbPassword"
-    generate-password-lscsde > "${SECRETS_PATH}/OhdsiDbPassword"
+    krapctl tools generate-password > "${SECRETS_PATH}/OhdsiDbPassword"
 else 
     echo "OhdsiDbPassword Already Exists"
 fi

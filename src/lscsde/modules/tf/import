@@ -1,3 +1,1 @@
-#!/bin/bash
-
 terraform import --var-file=variables/$(terraform workspace show).tfvars "$@"
