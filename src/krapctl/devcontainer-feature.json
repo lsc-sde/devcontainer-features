@@ -1,12 +1,11 @@
 {
     "id": "krapctl",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "krapctl",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/krapctl/docs/feature.html",
     "description": "Installs krapctl onto the devcontainer",
     "options": {
     },
     "installsAfter" :[
-        "ghcr.io/lsc-sde/devcontainer-features/aks-tools"
     ]
 }
