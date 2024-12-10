@@ -62,6 +62,7 @@ krapctl_command(){
                     fi
                     krapctl_command $@          
                 else
+                    shift
                     . $ITEM_PATH
                 fi
                 exit 0

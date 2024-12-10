@@ -1,12 +1,13 @@
 {
     "id": "apache-superset",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "name": "apache-superset",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/apache-superset/docs/feature.html",
     "description": "Installs apache-superset onto the devcontainer",
     "options": {
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/postgres-on-k3d",
         "ghcr.io/lsc-sde/devcontainer-features/nginx"
     ]

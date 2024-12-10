@@ -1,6 +1,6 @@
 {
     "id": "postgres-on-k3d",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "name": "postgres-on-k3d",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/postgres-on-k3d/docs/feature.html",
     "description": "Installs the PostgreSQL into the devcontainer's k3s cluster",
@@ -27,9 +27,10 @@
         }
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/metallb",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
     ],
-	"postCreateCommand": "setup-postgres-on-k3d"
+	"postCreateCommand": "krapctl setup postgres server"
 }

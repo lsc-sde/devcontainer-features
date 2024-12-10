@@ -23,14 +23,14 @@ This feature includes a collection of tools and scripts designed to make it easi
 | Name | Description | Default Value |
 | --- | --- | --- |
 
-### Scripts
+### CLI Commands
 The following scripts are provided by this feature:
 
-#### setup-jupyterhub
-The ***setup-jupyterhub*** command will install and configure Jupyter Hub on the local machine
+#### setup jupyterhub
+The ***setup jupyterhub*** command will install and configure Jupyter Hub on the local machine
 
 Example usage:
 ```bash
-setup-jupyterhub
+krapctl setup jupyterhub
 ```
 

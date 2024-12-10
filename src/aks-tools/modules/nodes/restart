@@ -1,0 +1,29 @@
+usage() { echo "Usage: $0 [-g <resource_group_name>] [-n <node_name>]" 1>&2; exit 1; }
+
+while getopts ":n:g:" o; do
+    case "${o}" in
+        n)
+            NODE_NAME=${OPTARG}
+            ;;
+        g)
+            RESOURCE_GROUP_NAME=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+kubectl cordon $NODE_NAME 
+kubectl drain $NODE_NAME --ignore-daemonsets=true 
+echo "Restarting ${NODE_NAME} in resource group ${RESOURCE_GROUP_NAME}"
+az vm restart -g $RESOURCE_GROUP_NAME -n $NODE_NAME 
+sleep 10 
+kubectl uncordon $NODE_NAME 
+until [ $(kubectl get node $NODE_NAME --output=json | jq -c '.status.conditions | map(select(.type == "Ready"))[0].status') = '"True"' ]; 
+do 
+    echo "sleeping 10 seconds\n" 
+    sleep 10; 
+done 
+echo "${NODE_NAME} successfully restarted"

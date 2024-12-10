@@ -1,6 +1,6 @@
 {
     "id": "aks-tools",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "name": "aks-tools",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/aks-tools/docs/feature.html",
     "description": "Installs aks-tools onto the devcontainer",
@@ -12,6 +12,7 @@
     },
     "installsAfter" :[
         "ghcr.io/devcontainers/features/azure-cli",
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/k3d"
     ]
 }

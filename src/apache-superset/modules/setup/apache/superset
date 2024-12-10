@@ -1,0 +1,139 @@
+. /etc/k3d/setup/environment
+. /usr/lib/postgres-on-k3d/etc/environment
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/apache-superset/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/apache/superset"
+IMAGE_TAG="${CURRENT_DATE}"
+CONTAINER_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
+
+
+sudo mkdir -p "${WORK_FOLDER}"
+sudo chmod 0777 "${WORK_FOLDER}"
+
+cd "/workspaces/lsc-sde/products/sde-3rd-party/superset/docker-apache-superset"
+docker build . -t "${CONTAINER_IMAGE}"
+docker push "${CONTAINER_IMAGE}"
+
+cd "${WORK_FOLDER}"
+
+gres-on-k3d-user -u superset -p superset
+krapctl setup postgres db -n superset -o superset
+
+helm repo add superset https://apache.github.io/superset
+
+if [ -f "${SECRETSPATH}/ApacheSupersetSecretKey" ]; then
+  echo "ApacheSupersetSecretKey is present in secrets"
+  SECRET_KEY=$(cat "${SECRETSPATH}/ApacheSupersetSecretKey")
+else
+  echo "ApacheSupersetSecretKey does not exist in secrets, creating it now"
+  SECRET_KEY=$(openssl rand -base64 42) 
+  echo $SECRET_KEY > "${SECRETSPATH}/ApacheSupersetSecretKey"
+fi
+
+CLIENT_ID=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientID")
+CLIENT_SECRET=$(cat "${SECRETSPATH}/ApacheSupersetAppRegistrationClientSecret")
+AZ_TENANT_ID=$(cat "${SECRETSPATH}/AzureTenantId")
+PG_FQDN_B64=$(echo -n "${PG_FQDN}" | base64 -w0)
+
+cat <<EOF > superset-test-env.yaml
+apiVersion: v1
+data:
+  DB_HOST: ${PG_FQDN_B64}
+  DB_NAME: c3VwZXJzZXQ=
+  DB_PASS: c3VwZXJzZXQ=
+  DB_PORT: NTQzMg==
+  DB_USER: c3VwZXJzZXQ=
+  REDIS_CELERY_DB: MA==
+  REDIS_DB: MQ==
+  REDIS_HOST: c3VwZXJzZXQtdGVzdC1yZWRpcy1oZWFkbGVzcw==
+  REDIS_PORT: NjM3OQ==
+  REDIS_PROTO: cmVkaXM=
+  REDIS_USER: ""
+kind: Secret
+metadata:
+  name: superset-test-env
+  namespace: superset-test
+type: Opaque
+EOF
+
+kubectl apply -f superset-test-env.yaml
+
+cat <<EOF > superset-config.yaml
+secretEnv:
+  create: false
+
+postgresql:
+  enabled: false
+
+connections:
+  db_host: "${PG_FQDN}"
+  db_port: "5432"
+  db_user: "superset"
+  db_pass: "superset"
+  db_name: "superset"
+
+# This is to workaround the problem with coredns which makes login.microsoftonline.com unavailable on docker desktop
+hostAliases: 
+- ip: 40.126.53.16
+  hostnames:
+  - login.microsoftonline.com
+
+configOverrides:  
+  secret: |
+    SECRET_KEY = '${SECRET_KEY}'
+
+  enable_oauth: |
+    # This will make sure the redirect_uri is properly computed, even with SSL offloading
+    ENABLE_PROXY_FIX = True
+
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+    AUTH_TYPE = AUTH_OAUTH
+    OAUTH_PROVIDERS = [
+      {
+        "name": "azure",
+        "icon": "fa-windows",
+        "token_key": "access_token",
+        "remote_app": {
+          "client_id": "${CLIENT_ID}",
+          "client_secret": "${CLIENT_SECRET}",
+          "api_base_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2",
+          "client_kwargs": {
+              "scope": "User.read name preferred_username email profile upn",
+              "resource": "${CLIENT_ID}",
+              # Optionally enforce signature JWT verification
+              "verify_signature": False
+          },
+          "request_token_url": None,
+          "access_token_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2/token",
+          "authorize_url": "https://login.microsoftonline.com/${AZ_TENANT_ID}/oauth2/authorize",
+        },
+      },
+    ]
+
+    
+    # Will allow user self registration, allowing to create Flask users from Authorized User
+    AUTH_USER_REGISTRATION = True
+
+    # The default user self registration role
+    AUTH_USER_REGISTRATION_ROLE = "Admin"
+
+image:
+  repository: ${IMAGE_NAME}
+  tag: ${IMAGE_TAG}
+  imagePullPolicy: Always
+
+bootstrapScript: |
+  #!/bin/bash
+  pip install --upgrade "apache-superset[databricks]"
+  pip install --upgrade authlib
+
+EOF
+
+#cat superset-config.yaml
+
+helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
+kubectl rollout restart deployments/superset-test -n superset-test
+nohup kubectl port-forward service/superset-test 8088:8088 --namespace superset-test &
+cd "${CURRENT_FOLDER}"

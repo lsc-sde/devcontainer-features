@@ -1,6 +1,6 @@
 {
     "id": "keycloak",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "name": "keycloak",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/keycloak/docs/feature.html",
     "description": "Installs keycloak into the devcontainer's k3s cluster",
@@ -27,6 +27,7 @@
         }
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/temurin",
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd",

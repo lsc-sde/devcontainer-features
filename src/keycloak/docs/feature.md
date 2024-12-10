@@ -31,11 +31,11 @@ This feature includes a collection of tools and scripts designed to make it easi
 ### Scripts
 The following scripts are provided by this feature:
 
-#### setup-keycloak
-The ***setup-keycloak*** command will install and configure Keycloak on the local machine
+#### setup keycloak
+The ***setup keycloak*** command will install and configure Keycloak on the local machine
 
 Example usage:
 ```bash
-setup-keycloak
+krapctl setup keycloak
 ```
 

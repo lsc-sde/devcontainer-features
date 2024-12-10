@@ -1,6 +1,6 @@
 {
     "id": "trust-manager",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "trust-manager",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/trust-manager/docs/feature.html",
     "description": "Installs Trust Manager into the devcontainer's k3s cluster",
@@ -15,8 +15,9 @@
         }
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
     ],
-	"postCreateCommand": "setup-trustmanager"
+	"postCreateCommand": "krapctl setup trustmanager"
 }

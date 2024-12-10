@@ -26,11 +26,11 @@ This feature includes a collection of tools and scripts designed to make it easi
 | chartVersion | The version of the helm chart to use | 0.1.12 |
 | guacNamespace | The namespace to deploy Apache Guacamole | guacamole |
 
-### Scripts
+### CLI Commands
 The following scripts are provided by this feature:
 
-#### setup-apache-guacamole
-The ***setup-apache-guacamole*** command will install and configure apache guacamole on the local machine
+#### setup apache guacamole
+The ***setup apache guacamole*** command will install and configure apache guacamole on the local machine
 
 Example usage:
 ```bash

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. /etc/krapctl/environment
+
 usage() { echo "Usage: $0 [-r helm_repo_url] [-v <chart_version>] [-n <namespace>]" 1>&2; exit 1; }
 
 while getopts ":r:v:n:" o; do
@@ -21,7 +23,6 @@ done
 shift $((OPTIND-1))
 
 
-mkdir -p /usr/lib/apache-guacamole/bin
 mkdir -p /usr/lib/apache-guacamole/db
 mkdir -p /usr/lib/apache-guacamole/etc
 mkdir -p /usr/lib/apache-guacamole/work
@@ -33,9 +34,7 @@ GUAC_VERSION="${CHARTVERSION}"
 GUAC_NAMESPACE="${GUACNAMESPACE}"
 EOF
 
-cp -R ./bin /usr/lib/apache-guacamole/
 cp -R ./db /usr/lib/apache-guacamole/
-
-ln -s /usr/lib/apache-guacamole/bin/setup-apache-guacamole /bin/setup-apache-guacamole
+cp -R ./modules/* "${KRAPCTL_MODULES}"
 
 exit 0

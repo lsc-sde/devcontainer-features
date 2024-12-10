@@ -1,5 +1,9 @@
 #!/bin/bash
 
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
+
 usage() { echo "Usage: $0 [-p <path_to_flux_folder>] [-v <nginx_version>] [-n <nginx_namespace>]" 1>&2; exit 1; }
 
 while getopts ":p:v:n:" o; do
@@ -20,8 +24,6 @@ while getopts ":p:v:n:" o; do
 done
 shift $((OPTIND-1))
 
-
-mkdir -p /usr/lib/nginx/bin
 mkdir -p /usr/lib/nginx/etc
 mkdir -p /usr/lib/nginx/work
 chmod 0777 /usr/lib/nginx/work
@@ -32,8 +34,6 @@ NGINX_VERSION="${NGINXVERSION}"
 NGINX_NAMESPACE="${NGINXNAMESPACE}"
 EOF
 
-cp -R ./bin /usr/lib/nginx/
 
-ln -s /usr/lib/nginx/bin/setup-nginx /bin/setup-nginx
 
 exit 0

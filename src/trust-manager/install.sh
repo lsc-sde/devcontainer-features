@@ -1,5 +1,9 @@
 #!/bin/bash
 
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
+
 usage() { echo "Usage: $0 [-v <version>] [-n <namespace>]" 1>&2; exit 1; }
 
 while getopts ":v:n:" o; do
@@ -27,9 +31,5 @@ cat <<EOF > /usr/lib/trust-manager/etc/environment
 TRUSTMANAGER_VERSION="${TRUSTMANAGERVERSION}"
 TRUSTMANAGER_NAMESPACE="${TRUSTMANAGERNAMESPACE}"
 EOF
-
-cp -R ./bin /usr/lib/trust-manager/
-
-ln -s /usr/lib/trust-manager/bin/setup-trustmanager /bin/setup-trustmanager
 
 exit 0

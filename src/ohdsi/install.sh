@@ -1,5 +1,9 @@
 #!/bin/bash
 
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
+
 mkdir -p /usr/lib/ohdsi/bin
 mkdir -p /usr/lib/ohdsi/etc
 
@@ -8,8 +12,5 @@ OHDSI_HELM_CHART_PATH="${PATHTOHELMCHART}"
 OHDSI_NAMESPACE="${OHDSINAMESPACE}"
 EOF
 
-cp -R ./bin /usr/lib/ohdsi/
-
-ln -s /usr/lib/ohdsi/bin/setup-ohdsi.sh /bin/setup-ohdsi
 
 exit 0

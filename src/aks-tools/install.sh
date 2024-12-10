@@ -1,5 +1,7 @@
 #!/bin/bash
 
-cp ./bin/* /bin/
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
 
 az aks install-cli

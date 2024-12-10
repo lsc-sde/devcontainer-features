@@ -28,14 +28,14 @@ This feature includes a collection of tools and scripts designed to make it easi
 | namespace | The namespace where postgres will be installed | postgres-on-k3d |
 | instanceName | The name of the postgres instance | k3d-postgres |
 
-### Scripts
-The following scripts are provided by this feature:
+### CLI Subcommands
+The following subcommands are provided by this feature:
 
-#### setup-postgres-on-k3d.sh
-The ***setup-postgres-on-k3d.sh*** command will install and configure Postgres on the local machine's k3d instance
+#### setup postgres server
+The ***setup postgres server*** command will install and configure Postgres on the local machine's k3d instance
 
 Example usage:
 ```bash
-setup-postgres-on-k3d.sh
+krapctl setup postgres server
 ```
 

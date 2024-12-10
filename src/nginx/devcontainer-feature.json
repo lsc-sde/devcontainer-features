@@ -1,6 +1,6 @@
 {
     "id": "nginx",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "nginx",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/nginx/docs/feature.html",
     "description": "Installs NGINX into the devcontainer's k3s cluster",
@@ -19,8 +19,9 @@
         }
     },
     "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
         "ghcr.io/lsc-sde/devcontainer-features/k3d",
         "ghcr.io/lsc-sde/devcontainer-features/fluxcd"
     ],
-	"postCreateCommand": "setup-nginx"
+	"postCreateCommand": "krapctl setup nginx"
 }

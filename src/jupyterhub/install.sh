@@ -1,6 +1,9 @@
 #!/bin/bash
 
-mkdir -p /usr/lib/jupyterhub/bin
+. /etc/krapctl/environment
+
+cp -R ./modules/* "${KRAPCTL_MODULES}"
+
 mkdir -p /usr/lib/jupyterhub/etc
 mkdir -p /usr/lib/jupyterhub/work
 chmod 0777 /usr/lib/jupyterhub/work
@@ -15,11 +18,6 @@ IMAGE_TAG="${IMAGETAG}"
 HUB_DOCKER_IMAGE_DEFINITION="${HUBDOCKERIMAGEDEFINITION}"
 ANALYTICSWORKSPACE_HELM_CHART="${ANALYTICSWORKSPACEHELMCHART}"
 EOF
-
-cp -R ./bin /usr/lib/jupyterhub/
-
-ln -s /usr/lib/jupyterhub/bin/setup-jupyterhub.sh /bin/setup-jupyterhub
-
 
 pip install kubernetes_asyncio
 pip install lscsde_workspace_mgmt

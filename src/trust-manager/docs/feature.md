@@ -28,11 +28,11 @@ This feature includes a collection of tools and scripts designed to make it easi
 ### Scripts
 The following scripts are provided by this feature:
 
-#### setup-trustmanager
-The ***setup-trustmanager*** command will install and configure trust manager on the local machine's k3d instance
+#### setup trustmanager
+The ***setup trustmanager*** command will install and configure trust manager on the local machine's k3d instance
 
 Example usage:
 ```bash
-setup-trustmanager
+krapctl setup trustmanager
 ```
 

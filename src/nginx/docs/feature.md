@@ -26,14 +26,14 @@ This feature includes a collection of tools and scripts designed to make it easi
 | nginxVersion | The version of NGINX to install | 4.9.1 | 
 | nginxNamespace | The namespace where nginx is installed | ingress-nginx |
 
-### Scripts
+### CLI Commands
 The following scripts are provided by this feature:
 
-#### setup-nginx
-The ***setup-nginx*** command will install and configure NGinX on the local machine
+#### setup nginx
+The ***setup nginx*** command will install and configure NGinX on the local machine
 
 Example usage:
 ```bash
-setup-nginx
+krapctl setup nginx
 ```
 

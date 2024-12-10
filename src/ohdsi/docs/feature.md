@@ -25,14 +25,14 @@ This feature includes a collection of tools and scripts designed to make it easi
 | pathToHelmChart | The path where the helm chart configuration is located | /workspaces/lsc-sde/iac/helm/ohdsi |
 | ohdsiNamespace | The namespace where ohdsi is installed | ingress-nginx |
 
-### Scripts
+### CLI Commands
 The following scripts are provided by this feature:
 
-#### setup-ohdsi
-The ***setup-ohdsi*** command will install and configure OHDSI on the local machine
+#### setup ohdsi
+The ***setup ohdsi*** command will install and configure OHDSI on the local machine
 
 Example usage:
 ```bash
-setup-ohdsi
+krapctl setup ohdsi
 ```
 

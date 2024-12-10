@@ -26,11 +26,11 @@ This feature includes a collection of tools and scripts designed to make it easi
 ### Scripts
 The following scripts are provided by this feature:
 
-#### setup-apache-superset
-The ***setup-apache-superset*** command will install and configure Apache Superset on the local machine
+#### setup apache superset
+The ***setup apache superset*** command will install and configure Apache Superset on the local machine
 
 Example usage:
 ```bash
-setup-apache-superset
+krapctl setup apache superset
 ```
 

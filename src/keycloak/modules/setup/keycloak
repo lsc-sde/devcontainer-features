@@ -1,0 +1,91 @@
+sudo chmod 0777 /var/lib/rancher/k3s/storage
+
+. /etc/k3d/setup/environment
+. /usr/lib/keycloak/etc/environment
+. /usr/lib/postgres-on-k3d/etc/environment
+
+echo "Setting up keycloak operator"
+echo "KEYCLOAK_NAMESPACE = ${KEYCLOAK_NAMESPACE}"
+echo "KEYCLOAK_FLUX_PATH = ${KEYCLOAK_FLUX_PATH}"
+echo "KEYCLOAK_VERSION = ${KEYCLOAK_VERSION}"
+echo "KEYCLOAK_IMAGE = ${KEYCLOAK_IMAGE}"
+
+export dns_prefix=""
+export private_dnz_zone="xlscsde.local"
+export keycloak_namespace="${KEYCLOAK_NAMESPACE}"
+
+CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+export KEYCLOAK_INSTANCE_IMAGE="${REGISTRY_NAME}:${REGISTRY_PORT}/${KEYCLOAK_IMAGE}:${CURRENT_DATE}"
+export keycloak_image="${KEYCLOAK_INSTANCE_IMAGE}"
+WORK_FOLDER="/usr/lib/keycloak/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+
+mkdir -p "${WORK_FOLDER}"
+
+cd "${KEYCLOAK_IMAGE_PATH}"
+
+docker build . -t "${KEYCLOAK_INSTANCE_IMAGE}"
+docker push "${KEYCLOAK_INSTANCE_IMAGE}"
+
+cd "${WORK_FOLDER}"
+
+krapctl setup postgres user -u keycloak -p keycloak
+krapctl setup postgres db -n keycloak -o keycloak
+
+export PGPASSWORD="keycloak"
+export PG_FQDN
+DBPOPULATED=$(psql -h 127.0.0.1 -U keycloak --csv -t -c "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public' and tablename = 'admin_event_entity';")
+
+if [ "${DBPOPULATED}" == "admin_event_entity" ]; then
+  echo "database already appears to be populated, nothing to do"
+else
+  echo "database not populated, populating from db"
+  psql -h 127.0.0.1 -U keycloak -f "/usr/lib/keycloak/db/database.sql"
+fi
+
+openssl req -new -nodes -out keycloak.csr -newkey rsa:4096 -keyout keycloak.key -subj '/CN=Keycloak/C=GB/ST=Anywhere/L=Anywhere/O=LSCSDE'
+
+cat <<EOF > keycloak.v3.ext 
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = keycloak.xlscsde.local
+EOF
+
+openssl x509 -req -in keycloak.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out keycloak.crt -days 3650 -sha256 -extfile keycloak.v3.ext
+
+kubectl kustomize "${KEYCLOAK_FLUX_PATH}/cluster/local" -o "./operator.yaml"
+envsubst < "./operator.yaml" > "./operator.substituted.yaml"
+
+cat <<EOF > ./namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak
+  labels:
+    xlscsde.local/inject: "enabled"
+EOF
+kubectl apply -f ./namespace.yaml
+
+kubectl create secret tls "${dns_prefix}keycloak.${private_dnz_zone}-tls" --cert keycloak.crt --key keycloak.key -n keycloak
+
+cat <<EOF > ./secret.yaml
+apiVersion: v1
+data:
+  db_username: a2V5Y2xvYWs=
+  db_password: a2V5Y2xvYWs=
+kind: Secret
+metadata:
+  name: keycloak-db-secrets
+  namespace: keycloak
+type: Opaque
+EOF
+kubectl apply -f ./secret.yaml
+kubectl apply -f "./operator.substituted.yaml" -n keycloak
+
+
+cd "${CURRENT_FOLDER}"
+
+exit 0
