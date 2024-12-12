@@ -1,6 +1,6 @@
 {
     "id": "aks-tools",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "name": "aks-tools",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/aks-tools/docs/feature.html",
     "description": "Installs aks-tools onto the devcontainer",
