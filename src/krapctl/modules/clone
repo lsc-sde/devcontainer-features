@@ -1,0 +1,5 @@
+if [ ! -d \"/${KRAPCTL_WORKSPACE_PATH}/lsc-sde\" ]; then 
+    echo "Cloning to ${KRAPCTL_WORKSPACE_PATH}";
+    cd "${KRAPCTL_WORKSPACE_PATH}";
+    git clone https://github.com/lsc-sde/lsc-sde.git --recurse-submodules; 
+fi

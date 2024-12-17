@@ -1,0 +1,69 @@
+usage() {
+    echo "Usage: $0 ${KRAPCTL_COMMAND} -p <port_number> -s <service_name> -n <service_namespace>";
+
+    krapctl_exit 1
+}
+
+check_service_pod_status() {
+    POD_PHASE=$(kubectl get ep "${SERVICE_NAME}" -n "${SERVICE_NAMESPACE}" -o=jsonpath='{.subsets[*].addresses[*].ip}' | tr ' ' '\n' | xargs -I % kubectl get pods -n "${SERVICE_NAMESPACE}" -o=jsonpath={.items..status.phase} --field-selector=status.podIP=%)
+    if [[ "${POD_PHASE}" =~ "Running" ]]; then
+        echo "Pod is running"
+        return 0
+    else 
+        echo "Pod is not running, current state ${POD_PHASE}"
+        return 1
+    fi
+}
+
+while getopts ":p:n:s:" o; do
+    case "${o}" in
+        p)
+            PORT_NUMBER=${OPTARG}
+            ;;
+        s)
+            SERVICE_NAME=${OPTARG}
+            ;;
+        n)
+            SERVICE_NAMESPACE=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+if [ -z "${PORT_NUMBER}" ]; then
+    echo "Port number is required"
+    usage
+fi
+
+if [ -z "${SERVICE_NAME}" ]; then
+    echo "Service Name is required"
+    usage
+fi
+
+if [ -z "${SERVICE_NAMESPACE}" ]; then
+    echo "Service Namespace is required"
+    usage
+fi
+
+netstat -4nl | grep "127.0.0.1:${PORT_NUMBER}" &>/dev/null
+if [ $? -eq 1 ]; then    
+    check_service_pod_status
+    if [ $? -eq 1 ]; then
+        echo "Waiting 5 seconds for pod"
+        sleep 5
+
+        echo "Checking if pod is running"
+        check_service_pod_status
+        if [ $? -eq 1 ]; then
+            krapctl_exit 2
+        fi
+    fi
+    echo "Port ${PORT_NUMBER} not exposed, forwarding from ${SERVICE_NAME} on ${SERVICE_NAMESPACE}"
+    cd "${KRAPCTL_WORK}"
+    nohup kubectl port-forward service/${SERVICE_NAME} ${PORT_NUMBER}:${PORT_NUMBER} --namespace ${SERVICE_NAMESPACE} &
+    sleep 1
+else 
+    echo "Port ${PORT_NUMBER} is already exposed, ignoring"
+fi

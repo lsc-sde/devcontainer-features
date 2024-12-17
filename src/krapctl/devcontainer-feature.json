@@ -1,11 +1,12 @@
 {
     "id": "krapctl",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "name": "krapctl",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/krapctl/docs/feature.html",
     "description": "Installs krapctl onto the devcontainer",
     "options": {
     },
     "installsAfter" :[
-    ]
+    ],
+	"postCreateCommand": "krapctl clone"
 }

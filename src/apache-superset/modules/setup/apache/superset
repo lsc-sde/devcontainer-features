@@ -135,5 +135,6 @@ EOF
 
 helm upgrade --install -n superset-test --create-namespace --values superset-config.yaml superset-test  superset/superset
 kubectl rollout restart deployments/superset-test -n superset-test
-nohup kubectl port-forward service/superset-test 8088:8088 --namespace superset-test &
+krapctl port forward -p 8088 -s superset-test -n superset-test
+krapctl setup coredns rewrite -s superset.xlscsde.local
 cd "${CURRENT_FOLDER}"

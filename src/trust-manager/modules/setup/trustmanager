@@ -3,6 +3,8 @@ sudo chmod 0777 /var/lib/rancher/k3s/storage
 . /etc/k3d/setup/environment
 . /usr/lib/trust-manager/etc/environment
 
+export cert_manager_namespace="${TRUSTMANAGER_NAMESPACE}"
+
 echo "Setting up trust-manager"
 echo "TRUSTMANAGER_NAMESPACE = ${TRUSTMANAGER_NAMESPACE}"
 echo "TRUSTMANAGER_VERSION = ${TRUSTMANAGER_VERSION}"
@@ -25,67 +27,17 @@ fi
 mkdir -p "${WORK_FOLDER}"
 cd "${WORK_FOLDER}"
 
-cat <<EOF > ./namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ${TRUSTMANAGER_NAMESPACE}
-EOF
+krapctl_create_namespace "${TRUSTMANAGER_NAMESPACE}"
 
 kubectl create secret generic root-certificate --from-file="/usr/lib/trust-manager/work/ca.crt" -n "${TRUSTMANAGER_NAMESPACE}"
-
-
-kubectl apply -f ./namespace.yaml
 
 helm repo add trust-manager https://charts.jetstack.io
 helm repo update
 
 helm upgrade trust-manager --install trust-manager/trust-manager -n "${TRUSTMANAGER_NAMESPACE}" --version "${TRUSTMANAGER_VERSION}" --wait --set app.webhook.tls.helmCert.enabled=true
 
-cat <<EOF > ./bundle.yaml
-apiVersion: trust.cert-manager.io/v1alpha1
-kind: Bundle
-metadata:
-  name: xlscsde-local-bundle
-spec:
-  sources:
-  - useDefaultCAs: true
-  - secret:
-      name: root-certificate
-      key: ca.crt
-  target:
-    configMap:
-      key: "ca-certificates.crt" 
-    additionalFormats:
-      jks:
-        key: "bundle.jks"
-      pkcs12:
-        key: "bundle.p12"
-    namespaceSelector:
-      matchLabels:
-        xlscsde.local/inject: "enabled"
----
-apiVersion: trust.cert-manager.io/v1alpha1
-kind: Bundle
-metadata:
-  name: xlscsde-enterprise-certificate
-spec:
-  sources:
-  - secret:
-      name: root-certificate
-      key: ca.crt
-  target:
-    configMap:
-      key: "enterprise.crt" 
-    additionalFormats:
-      jks:
-        key: "enterprise.jks"
-      pkcs12:
-        key: "enterprise.p12"
-    namespaceSelector:
-      matchLabels:
-        xlscsde.local/inject: "enabled"
-EOF
+kubectl kustomize /workspaces/lsc-sde/iac/flux/certmanager/clusters/local | envsubst > ./bundle.yaml
+
 kubectl apply -f ./bundle.yaml
 
 cd "${CURRENT_FOLDER}"

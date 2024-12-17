@@ -1,6 +1,6 @@
 {
     "id": "apache-superset",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "name": "apache-superset",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/apache-superset/docs/feature.html",
     "description": "Installs apache-superset onto the devcontainer",

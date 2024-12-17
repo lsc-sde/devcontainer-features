@@ -36,11 +36,33 @@ krapctl_usage() {
         format_command_usage $ITEM_PATH
     done
     
-
-    exit 1; 
 }
 
+krapctl_exit() {
+    cd "${KRAPCTL_PWD}" # Change the directory back to the starting location in case it has changed for whatever reason
+    exit $1; 
+}
+# usage:
+#   krapctl_psql_populate <user_name> <schema_name> <table_name> <population_script>
+krapctl_psql_populate(){
+    DBPOPULATED=$(psql -h 127.0.0.1 -U $1 --csv -t -c "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = '$2' and tablename = '$3';")
+    echo "$? '${DBPOPULATED}'"
 
+    if [ "${DBPOPULATED}" == "$3" ]; then
+    echo "database already appears to be populated, nothing to do"
+    else
+    echo "database not populated, populating from db"
+    psql -h 127.0.0.1 -U $1 -f "$4"
+    fi
+
+}
+
+# Usage:
+#   krapctl_docker_build_and_push <path_to_file> <image_name>
+krapctl_docker_build_and_push(){
+    docker build "$1" -t "$2"
+    docker push "$2"
+}
 
 krapctl_command(){
     # echo "KRAPCTL_MODULES = ${KRAPCTL_MODULES}"
@@ -62,10 +84,13 @@ krapctl_command(){
                     fi
                     krapctl_command $@          
                 else
+                    KRAPCTL_COMMAND="${KRAPCTL_COMMAND} ${ITEM_NAME}"
                     shift
                     . $ITEM_PATH
                 fi
-                exit 0
+
+                cd "${KRAPCTL_PWD}" # Change the directory back to the starting location in case it has changed for whatever reason
+                krapctl_exit 0
             fi
         done
 
@@ -75,4 +100,61 @@ krapctl_command(){
 
 }
 
+krapctl_create_namespace(){
+    kubectl get namespace/$1 &>/dev/null
+    if [ $? -eq 1 ]; then
+        kubectl create namespace $1
+    fi
+}
+
+## usage: 
+##   krapctl_helm_upgrade <namespace> <name> <chart_path> <config_template> 
+krapctl_helm_upgrade() {
+    echo "Performing a helm upgrade of $2 on namespace: $1"
+    cat "$4" | envsubst > "$2.yaml"
+
+    helm upgrade $2 --install "$3" -n "$1" -f "$2.yaml"
+}
+
+## usage: 
+##   krapctl_helm_upgrade_remote <namespace> <name> <chart_repository> <chart_name> <chart_version> <config_template> 
+krapctl_helm_upgrade_remote() {
+    REPO_RESULT=$(helm repo list | grep "$3")
+    if [ $? -eq 0 ]; then 
+        REPO_NAME="${REPO_RESULT%% *}"
+    else 
+        REPO_NAME="$2"
+        helm repo add "${REPO_NAME}" "$3"
+    fi
+    helm repo update
+
+    echo "Performing a helm upgrade of $2 on namespace: $1"
+    cat "$6" | envsubst > "$2.yaml"
+
+    helm upgrade $2 --install "${REPO_NAME}/$4" --version $5 -n "$1" -f "$2.yaml"
+}
+
+krapctl_create_certificate() {
+    kubectl get secret/$3 -n $4 &>/dev/null
+    if [ $? -eq 1 ]; then
+        echo "Secret $3 does not already exists in namespace: $4, attempting to create"
+
+        openssl req -new -nodes -out $1.csr -newkey rsa:4096 -keyout $1.key -subj '/CN=$1/C=GB/ST=Anywhere/L=Anywhere/O=LSCSDE'
+
+        cat <<EOF > $1.v3.ext 
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = $2
+EOF
+        openssl x509 -req -in $1.csr -CA /usr/lib/trust-manager/work/ca.crt -CAkey /usr/lib/trust-manager/work/ca.key -CAcreateserial -out $1.crt -days 3650 -sha256 -extfile $1.v3.ext
+        kubectl create secret tls $3 --cert $1.crt --key $1.key -n $4
+    else 
+        echo "Secret $3 already exists in namespace: $4, no action required"
+    fi
+}
+
+KRAPCTL_PWD=$(pwd)
 krapctl_command $@

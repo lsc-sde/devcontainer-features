@@ -1,17 +1,25 @@
 {
     "id": "apache-guacamole",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "name": "apache-guacamole",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/apache-guacamole/docs/feature.html",
     "description": "Installs Apache Guacamole into the devcontainer's k3s cluster",
     "options": {
-        "helmRepository" : {
+        "chartPath" : {
             "type" : "string",
-            "default" : "https://lsc-sde.github.io/iac-helm-repository/"
+            "default" : "${localWorkspaceFolder}/lsc-sde/products/sde-3rd-party/guacamole/iac-helm-guacamole"
         },
-        "chartVersion" : {
+        "operatorChartPath" : {
             "type" : "string",
-            "default" : "0.1.12"
+            "default" : "${localWorkspaceFolder}/lsc-sde/products/sde/analytics-workspace-management/awms-guacamole-operator/helm"
+        },
+        "kustomizePath" : {
+            "type" : "string",
+            "default" : "${localWorkspaceFolder}/lsc-sde/products/sde-3rd-party/guacamole/iac-flux-guacamole/cluster/local"
+        },
+        "imagePath" : {
+            "type" : "string",
+            "default" : "${localWorkspaceFolder}/lsc-sde/products/sde/analytics-workspace-management/awms-guacamole-operator"
         },
         "guacNamespace" : {
             "type" : "string",

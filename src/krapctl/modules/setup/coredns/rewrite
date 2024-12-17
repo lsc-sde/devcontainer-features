@@ -1,0 +1,42 @@
+usage() {
+    echo "Usage: $0 ${KRAPCTL_COMMAND} -s <source_name> [-t <target_name>]";
+
+    krapctl_exit 1
+}
+
+while getopts ":s:t:" o; do
+    case "${o}" in
+        s)
+            SOURCE_NAME=${OPTARG}
+            ;;
+        t)
+            TARGET_NAME=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+
+if [ -z "${SOURCE_NAME}" ]; then
+    echo "Source is required"
+    usage
+fi
+
+. /usr/lib/nginx/etc/environment
+
+if [ -z "${TARGET_NAME}" ]; then
+    TARGET_NAME="nginx-ingress-nginx-controller.${NGINX_NAMESPACE}.svc.cluster.local"
+fi
+
+kubectl get configmap/coredns-custom -n kube-system &>/dev/null
+if [ $? -eq 1 ]; then
+    echo "coredns-custom configmap does not exist, creating"
+    kubectl create configmap coredns-custom -n kube-system --from-literal="${SOURCE_NAME}.override"="rewrite name ${SOURCE_NAME} ${TARGET_NAME}"
+else 
+    echo "coredns-custom configmap exists, updating"
+    kubectl patch configmap coredns-custom -n kube-system -p "{\"data\":{ \"${SOURCE_NAME}.override\" : \"rewrite name ${SOURCE_NAME} ${TARGET_NAME}\" }}"
+fi
+
+kubectl rollout restart deployments/coredns -n kube-system

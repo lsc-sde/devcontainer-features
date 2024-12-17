@@ -1,6 +1,6 @@
 {
     "id": "trust-manager",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "trust-manager",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/trust-manager/docs/feature.html",
     "description": "Installs Trust Manager into the devcontainer's k3s cluster",

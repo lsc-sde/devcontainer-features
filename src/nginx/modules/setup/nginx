@@ -15,61 +15,15 @@ CURRENT_FOLDER=$(pwd)
 
 mkdir -p "${WORK_FOLDER}"
 cd "${WORK_FOLDER}"
+krapctl_create_namespace "${NGINX_NAMESPACE}"
 
-cat <<EOF > ./namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ${NGINX_NAMESPACE}
-EOF
-kubectl apply -f ./namespace.yaml
-
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-
-cat <<EOF > config.yaml
-controller:
-  allowSnippetAnnotations: true
-  ingressClass:
-    name: nginx
-
-  config:
-    proxy-buffers: "4 16k"
-    proxy-buffer-size: "16k"
-  replicaCount: 2
-  service:
-    annotations: 
-      "service.beta.kubernetes.io/port_80_no_probe_rule" : "true"
-      "service.beta.kubernetes.io/port_443_no_probe_rule" : "true"
-
-  admissionWebhooks:
-    enabled: true
-    timeoutSeconds: 30
-EOF
-
-helm upgrade nginx --install ingress-nginx/ingress-nginx -n "${NGINX_NAMESPACE}" --version "${NGINX_VERSION}" -f config.yaml
+krapctl_helm_upgrade_remote "${NGINX_NAMESPACE}" nginx "https://kubernetes.github.io/ingress-nginx" ingress-nginx "${NGINX_VERSION}" "${NGINX_FLUX_PATH}/clusters/local/config.yaml"
 
 NGINX_IP=$(kubectl get svc -n nginx nginx-ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
 
-cat <<EOF > corednsms.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: coredns-custom
-  namespace: kube-system
-data:
-    xlscsde.override: |
-      rewrite name jupyter.xlscsde.local nginx-ingress-nginx-controller.${NGINX_NAMESPACE}.svc.cluster.local
-      rewrite name keycloak.xlscsde.local nginx-ingress-nginx-controller.${NGINX_NAMESPACE}.svc.cluster.local
-      rewrite name ohdsi.xlscsde.local nginx-ingress-nginx-controller.${NGINX_NAMESPACE}.svc.cluster.local
-      rewrite name guacamole.xlscsde.local nginx-ingress-nginx-controller.${NGINX_NAMESPACE}.svc.cluster.local
-EOF
+krapctl setup coredns rewrite nginx.xlscsde.local
 
-kubectl apply -f corednsms.yaml
-
-kubectl rollout restart deployments/coredns -n kube-system
-
-nohup kubectl port-forward -n "${NGINX_NAMESPACE}" svc/nginx-ingress-nginx-controller 443:443 &
+krapctl port forward -p 443 -s nginx-ingress-nginx-controller -n "${NGINX_NAMESPACE}"
 
 cd "${CURRENT_FOLDER}"
 
