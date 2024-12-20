@@ -21,7 +21,7 @@ krapctl_helm_upgrade_remote "${NGINX_NAMESPACE}" nginx "https://kubernetes.githu
 
 NGINX_IP=$(kubectl get svc -n nginx nginx-ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
 
-krapctl setup coredns rewrite nginx.xlscsde.local
+krapctl setup coredns rewrite -s nginx.xlscsde.local
 
 krapctl port forward -p 443 -s nginx-ingress-nginx-controller -n "${NGINX_NAMESPACE}"
 
