@@ -36,6 +36,9 @@ krapctl_helm_upgrade_remote "${NAMESPACE}" jh-test "${HELM_REPOSITORY}" "${CHART
 
 helm upgrade -i -n awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" --create-namespace
 
+kubectl kustomize "${KUSTOMIZE_PATH}" | envsubst > ./devcontainer.yaml
+kubectl apply -f ./devcontainer.yaml
+
 cd "${CURRENT_FOLDER}"
 
 krapctl setup coredns rewrite -s jupyter.xlscsde.local
