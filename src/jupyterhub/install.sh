@@ -28,4 +28,7 @@ pip install pytest
 pip install pytest-asyncio
 pip install build
 pip install twine
+pip install logger
+pip install fastapi
+pip install uvicorn
 exit 0
