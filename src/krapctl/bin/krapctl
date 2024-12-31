@@ -60,7 +60,10 @@ krapctl_psql_populate(){
 # Usage:
 #   krapctl_docker_build_and_push <path_to_file> <image_name>
 krapctl_docker_build_and_push(){
+    echo "Building Docker Image '$1' as '$2'"
     docker build "$1" -t "$2"
+
+    echo "Pushing docker image $2"
     docker push "$2"
 }
 
