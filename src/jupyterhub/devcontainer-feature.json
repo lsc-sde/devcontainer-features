@@ -1,6 +1,6 @@
 {
     "id": "jupyterhub",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "name": "jupyterhub", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/jupyterhub/docs/feature.html",
     "description": "Installs the JupyterHub into the devcontainer's k3s cluster",
@@ -32,6 +32,10 @@
         "hubDockerImageDefinition" : {
             "type" : "string",
             "default" : "/workspaces/lsc-sde/docker/jupyterhub"
+        },
+        "awmsDockerImageDefinition" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/docker/analytics-workspace-mgmt"
         },
         "analyticsWorkspaceHelmChart" : {
             "type" : "string",

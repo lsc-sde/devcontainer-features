@@ -13,6 +13,7 @@ export REGISTRY_NAME
 export REGISTRY_PORT
 export IMAGE_NAME
 export FULL_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/${IMAGE_NAME}:${CURRENT_DATE}"
+export AMWS_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/${IMAGE_NAME}-awms:${CURRENT_DATE}"
 export jupyter_hub_namespace="${NAMESPACE}"
 
 mkdir -p "${WORK_FOLDER}"
@@ -20,6 +21,7 @@ mkdir -p "${WORK_FOLDER}"
 echo "Building docker image based on definition in: ${HUB_DOCKER_IMAGE_DEFINITION}"
 
 krapctl_docker_build_and_push "${HUB_DOCKER_IMAGE_DEFINITION}" "${FULL_IMAGE_NAME}"
+krapctl_docker_build_and_push "${AWMS_DOCKER_IMAGE_DEFINITION}" "${AWMS_IMAGE_NAME}"
 
 cd "${WORK_FOLDER}"
 
@@ -34,7 +36,7 @@ kubectl label "namespace/${NAMESPACE}" xlscsde.local/inject=enabled
 
 krapctl_helm_upgrade_remote "${NAMESPACE}" jh-test "${HELM_REPOSITORY}" "${CHART_NAME}" "${CHART_VERSION}" "${KUSTOMIZE_PATH}/config.yaml"
 
-helm upgrade -i -n awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" --create-namespace
+krapctl_helm_upgrade awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" "${KUSTOMIZE_PATH}/config-awms.yaml"
 
 kubectl kustomize "${KUSTOMIZE_PATH}" | envsubst > ./devcontainer.yaml
 kubectl apply -f ./devcontainer.yaml
