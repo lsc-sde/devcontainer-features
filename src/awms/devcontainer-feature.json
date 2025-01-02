@@ -1,0 +1,34 @@
+{
+    "id": "awms",
+    "version": "0.1.0",
+    "name": "awms", 
+    "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/awms/docs/feature.html",
+    "description": "Installs the AWMS into the devcontainer's k3s cluster",
+    "options": {
+        "namespace" : {
+            "type" : "string",
+            "default" : "jh-test"
+        },
+        "awmsDockerImageDefinition" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/docker/analytics-workspace-mgmt"
+        },
+        "analyticsWorkspaceHelmChart" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/helm/analytics-workspace-management/"
+        },
+        "kustomizePath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/flux/jupyter/cluster/devcontainer"
+        }
+    },
+    "installsAfter" :[
+        "ghcr.io/lsc-sde/devcontainer-features/krapctl",
+        "ghcr.io/lsc-sde/devcontainer-features/k3d",
+        "ghcr.io/lsc-sde/devcontainer-features/metallb",
+        "ghcr.io/lsc-sde/devcontainer-features/fluxcd",
+        "ghcr.io/lsc-sde/devcontainer-features/nginx",
+        "ghcr.io/lsc-sde/devcontainer-features/keycloak",
+        "ghcr.io/lsc-sde/devcontainer-features/trust-manager"
+    ]
+}

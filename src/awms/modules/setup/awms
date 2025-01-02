@@ -1,0 +1,31 @@
+. /etc/k3d/setup/environment
+. /usr/lib/awms/etc/environment
+
+export CURRENT_DATE=$(date '+%Y%m%d%H%M%S')
+WORK_FOLDER="/usr/lib/awms/work/${CURRENT_DATE}"
+CURRENT_FOLDER=$(pwd)
+
+krapctl setup trustmanager
+krapctl setup nginx
+krapctl setup keycloak
+
+export REGISTRY_NAME
+export REGISTRY_PORT
+export IMAGE_NAME="awms-mgmt"
+export AWMS_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-mgmt:${CURRENT_DATE}"
+export awms_namespace="${NAMESPACE}"
+
+mkdir -p "${WORK_FOLDER}"
+
+echo "Building docker image based on definition in: ${HUB_DOCKER_IMAGE_DEFINITION}"
+
+krapctl_docker_build_and_push "${AWMS_DOCKER_IMAGE_DEFINITION}" "${AWMS_IMAGE_NAME}"
+
+cd "${WORK_FOLDER}"
+
+krapctl_create_namespace "${NAMESPACE}"
+kubectl label "namespace/${NAMESPACE}" xlscsde.local/inject=enabled
+
+krapctl_helm_upgrade awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" "${KUSTOMIZE_PATH}/config-awms.yaml"
+
+cd "${CURRENT_FOLDER}"
