@@ -1,4 +1,7 @@
 if [ ! -d \"/${KRAPCTL_WORKSPACE_PATH}/lsc-sde\" ]; then 
+    echo "Setting permissions on ${KRAPCTL_WORKSPACE_PATH}";
+    sudo chmod 0777 "${KRAPCTL_WORKSPACE_PATH}";
+
     echo "Cloning to ${KRAPCTL_WORKSPACE_PATH}";
     cd "${KRAPCTL_WORKSPACE_PATH}";
     git clone https://github.com/lsc-sde/lsc-sde.git --recurse-submodules; 
