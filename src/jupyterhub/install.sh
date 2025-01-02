@@ -31,4 +31,7 @@ pip install twine
 pip install logger
 pip install fastapi
 pip install uvicorn
+pip install kubernetes
+pip install psycopg2-binary
+MULTIDICT_NO_EXTENSIONS=1 pip install kopf
 exit 0
