@@ -7,5 +7,5 @@ apt-get install -y maven
 
 mkdir -p /usr/lib/temurin/etc
 cat <<EOF >> /usr/lib/temurin/etc/environment
-export JAVA_HOME="/usr/lib/jvm/temurin-${TEMURINVERSION}-jdk-amd64"" >> 
+export JAVA_HOME="/usr/lib/jvm/temurin-${TEMURINVERSION}-jdk-amd64"
 EOF

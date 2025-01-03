@@ -1,6 +1,6 @@
 {
     "id": "temurin",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "name": "temurin",
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/temurin/docs/feature.html",
     "description": "Installs temurin into the devcontainer",
