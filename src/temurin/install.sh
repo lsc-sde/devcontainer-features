@@ -4,4 +4,8 @@ echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_COD
 apt-get update
 apt-get install -y temurin-${TEMURINVERSION}-jdk
 apt-get install -y maven
-echo "export JAVA_HOME="/usr/lib/jvm/temurin-${TEMURINVERSION}-jdk-amd64"" >> ~/.bashrc
+
+mkdir -p /usr/lib/temurin/etc
+cat <<EOF >> /usr/lib/temurin/etc/environment
+export JAVA_HOME="/usr/lib/jvm/temurin-${TEMURINVERSION}-jdk-amd64"" >> 
+EOF
