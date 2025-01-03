@@ -1,6 +1,6 @@
 {
     "id": "awms",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "awms", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/awms/docs/feature.html",
     "description": "Installs the AWMS into the devcontainer's k3s cluster",
@@ -16,6 +16,10 @@
         "analyticsWorkspaceHelmChart" : {
             "type" : "string",
             "default" : "/workspaces/lsc-sde/iac/helm/analytics-workspace-management/"
+        },
+        "crateOperatorPath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/products/sde/analytics-datasource-management/awms-crate-operator"
         },
         "kustomizePath" : {
             "type" : "string",
