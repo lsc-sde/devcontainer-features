@@ -28,5 +28,6 @@ pip install fastapi
 pip install uvicorn
 pip install kubernetes
 pip install psycopg2-binary
+pip install GitPython
 MULTIDICT_NO_EXTENSIONS=1 pip install kopf
 exit 0
