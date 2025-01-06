@@ -14,8 +14,9 @@ export REGISTRY_PORT
 export IMAGE_NAME="awms-mgmt"
 export AWMS_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-mgmt:${CURRENT_DATE}"
 export CRATE_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-crate-operator:${CURRENT_DATE}"
+export DATASOURCE_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-datasource-operator:${CURRENT_DATE}"
 export awms_namespace="${NAMESPACE}"
-export awms_crate_image="${CRATE_IMAGE_NAME}"
+export awms_datasource_image="${DATASOURCE_IMAGE_NAME}"
 
 mkdir -p "${WORK_FOLDER}"
 
@@ -23,6 +24,7 @@ echo "Building docker image based on definition in: ${HUB_DOCKER_IMAGE_DEFINITIO
 
 krapctl_docker_build_and_push "${AWMS_DOCKER_IMAGE_DEFINITION}" "${AWMS_IMAGE_NAME}"
 krapctl_docker_build_and_push "${CRATE_OPERATOR_PATH}" "${CRATE_IMAGE_NAME}"
+krapctl_docker_build_and_push "${DATASOURCE_OPERATOR_PATH}" "${DATASOURCE_IMAGE_NAME}"
 
 cd "${WORK_FOLDER}"
 
@@ -31,5 +33,6 @@ kubectl label "namespace/${NAMESPACE}" xlscsde.local/inject=enabled
 
 krapctl_helm_upgrade awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" "${KUSTOMIZE_PATH}/config-awms.yaml"
 krapctl_helm_upgrade awms-test awms-crate-operator "${CRATE_OPERATOR_PATH}/helm" "${CRATE_OPERATOR_PATH}/flux/config.yaml"
+krapctl_helm_upgrade awms-test awms-datasource-operator "${DATASOURCE_OPERATOR_PATH}/helm" "${DATASOURCE_OPERATOR_PATH}/flux/config.yaml"
 
 cd "${CURRENT_FOLDER}"
