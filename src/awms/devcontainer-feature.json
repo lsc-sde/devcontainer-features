@@ -1,6 +1,6 @@
 {
     "id": "awms",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "name": "awms", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/awms/docs/feature.html",
     "description": "Installs the AWMS into the devcontainer's k3s cluster",
