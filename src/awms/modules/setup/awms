@@ -16,6 +16,7 @@ export AWMS_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-mgmt:${CURRENT_DA
 export CRATE_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-crate-operator:${CURRENT_DATE}"
 export DATASOURCE_IMAGE_NAME="${REGISTRY_NAME}:${REGISTRY_PORT}/awms-datasource-operator:${CURRENT_DATE}"
 export awms_namespace="${NAMESPACE}"
+export awms_crate_image="${CRATE_IMAGE_NAME}"
 export awms_datasource_image="${DATASOURCE_IMAGE_NAME}"
 
 mkdir -p "${WORK_FOLDER}"
