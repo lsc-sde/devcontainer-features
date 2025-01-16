@@ -54,6 +54,7 @@ EOF
 kubectl apply -f ./secret.yaml
 kubectl apply -f "./operator.substituted.yaml" -n keycloak
 
+krapctl setup coredns rewrite -s keycloak.xlscsde.local
 
 cd "${CURRENT_FOLDER}"
 
