@@ -1,6 +1,6 @@
 {
     "id": "awms",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "name": "awms", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/awms/docs/feature.html",
     "description": "Installs the AWMS into the devcontainer's k3s cluster",
@@ -28,6 +28,22 @@
         "kustomizePath" : {
             "type" : "string",
             "default" : "/workspaces/lsc-sde/iac/flux/jupyter/cluster/devcontainer"
+        },
+        "secretsDistributorImageDefinition" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/docker/secrets-distributor"
+        },
+        "secretsDistributorChartPath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/helm/secrets-distributor"
+        },
+        "secretsDistributorKustomizePath" : {
+            "type" : "string",
+            "default" : "/workspaces/lsc-sde/iac/helm/secrets-distributor"
+        },
+        "secretsDistributorNamespace" : {
+            "type" : "string",
+            "default" : "secrets-distributor"
         }
     },
     "installsAfter" :[
