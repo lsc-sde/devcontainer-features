@@ -27,6 +27,7 @@ mkdir -p "${WORK_FOLDER}"
 krapctl_docker_build_and_push "${KEYCLOAK_IMAGE_PATH}" "${KEYCLOAK_INSTANCE_IMAGE}"
 
 cd "${WORK_FOLDER}"
+krapctl setup postgres server
 krapctl setup postgres user -u keycloak -p keycloak
 krapctl setup postgres db -n keycloak -o keycloak
 

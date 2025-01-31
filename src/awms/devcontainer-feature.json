@@ -1,13 +1,13 @@
 {
     "id": "awms",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "name": "awms", 
     "documentationURL": "https://lsc-sde.github.io/lsc-sde/imported/products/sde/devcontainer-features/src/awms/docs/feature.html",
     "description": "Installs the AWMS into the devcontainer's k3s cluster",
     "options": {
         "namespace" : {
             "type" : "string",
-            "default" : "jh-test"
+            "default" : "awms-test"
         },
         "awmsDockerImageDefinition" : {
             "type" : "string",

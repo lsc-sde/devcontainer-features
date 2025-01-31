@@ -32,8 +32,8 @@ cd "${WORK_FOLDER}"
 krapctl_create_namespace "${NAMESPACE}"
 kubectl label "namespace/${NAMESPACE}" xlscsde.local/inject=enabled
 
-krapctl_helm_upgrade awms-test awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" "${KUSTOMIZE_PATH}/config-awms.yaml"
-krapctl_helm_upgrade awms-test awms-crate-operator "${CRATE_OPERATOR_PATH}/helm" "${CRATE_OPERATOR_PATH}/flux/config.yaml"
-krapctl_helm_upgrade awms-test awms-datasource-operator "${DATASOURCE_OPERATOR_PATH}/helm" "${DATASOURCE_OPERATOR_PATH}/flux/config.yaml"
+krapctl_helm_upgrade "${NAMESPACE}" awms-test "${ANALYTICSWORKSPACE_HELM_CHART}" "${KUSTOMIZE_PATH}/config-awms.yaml"
+krapctl_helm_upgrade "${NAMESPACE}" awms-crate-operator "${CRATE_OPERATOR_PATH}/helm" "${CRATE_OPERATOR_PATH}/flux/config.yaml"
+krapctl_helm_upgrade "${NAMESPACE}" awms-datasource-operator "${DATASOURCE_OPERATOR_PATH}/helm" "${DATASOURCE_OPERATOR_PATH}/flux/config.yaml"
 
 cd "${CURRENT_FOLDER}"
